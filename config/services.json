@@ -1,0 +1,506 @@
+{
+  "version": 1,
+  "protected": [
+    "BFE",
+    "CryptSvc",
+    "DcomLaunch",
+    "Dhcp",
+    "Dnscache",
+    "EventSystem",
+    "gpsvc",
+    "RpcSs",
+    "RpcEptMapper",
+    "SecurityHealthService",
+    "SystemEventsBroker",
+    "WpnUserService",
+    "WinDefend",
+    "mpssvc",
+    "wuauserv",
+    "AppXSvc",
+    "ClipSVC",
+    "LSM",
+    "Power",
+    "ProfSvc",
+    "Schedule",
+    "Winmgmt"
+  ],
+  "services": [
+    {
+      "id": "svc_diagtrack",
+      "name": "Connected User Experiences and Telemetry (DiagTrack)",
+      "category": "Privacy",
+      "description": "Connected User Experiences and Telemetry: uploads diagnostic data.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'DiagTrack') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'DiagTrack' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'DiagTrack' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\DiagTrack",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\DiagTrack",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "DiagTrack",
+      "default_startup": "Automatic",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_dmwappushservice",
+      "name": "WAP Push Message Routing",
+      "category": "Privacy",
+      "description": "WAP push message routing used by telemetry and mobile device management.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'dmwappushservice') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'dmwappushservice' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'dmwappushservice' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\dmwappushservice",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\dmwappushservice",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "dmwappushservice",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_mapsbroker",
+      "name": "Downloaded Maps Manager",
+      "category": "Services",
+      "description": "Downloaded Maps Manager: only needed for offline maps.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'MapsBroker') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'MapsBroker' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'MapsBroker' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\MapsBroker",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\MapsBroker",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "MapsBroker",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_fax",
+      "name": "Fax",
+      "category": "Services",
+      "description": "Fax service, unused on virtually all student laptops.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'Fax') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'Fax' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'Fax' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Fax",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Fax",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "Fax",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_ajrouter",
+      "name": "AllJoyn Router Service",
+      "category": "Services",
+      "description": "AllJoyn Router for IoT devices, rarely used.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'AJRouter') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'AJRouter' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'AJRouter' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\AJRouter",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\AJRouter",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "AJRouter",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_trkwks",
+      "name": "Distributed Link Tracking Client",
+      "category": "Services",
+      "description": "Distributed Link Tracking Client: tracks NTFS shortcuts across network volumes.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'TrkWks') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'TrkWks' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'TrkWks' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\TrkWks",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\TrkWks",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "TrkWks",
+      "default_startup": "Automatic",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_lfsvc",
+      "name": "Geolocation Service",
+      "category": "Privacy",
+      "description": "Geolocation Service; kept on demand so location-aware apps still work.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'lfsvc') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'lfsvc' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'lfsvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\lfsvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\lfsvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "lfsvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_wsaifabricsvc",
+      "name": "Windows AI Fabric Service",
+      "category": "AI",
+      "description": "Windows AI Fabric service used by on-device AI features; starts only on demand.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'WSAIFabricSvc') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WSAIFabricSvc' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'WSAIFabricSvc' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WSAIFabricSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WSAIFabricSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WSAIFabricSvc",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false
+    },
+    {
+      "id": "svc_sysmain",
+      "name": "SysMain (Superfetch)",
+      "category": "Processes",
+      "description": "Superfetch/SysMain preloads apps. Disable only on low-RAM NVMe laptops showing disk thrashing; otherwise leave on.",
+      "risk_level": "Caution",
+      "check_script": "(Get-OptiServiceStartup -Name 'SysMain') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'SysMain' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'SysMain' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SysMain",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SysMain",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "SysMain",
+      "default_startup": "Automatic",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false
+    },
+    {
+      "id": "svc_wsearch",
+      "name": "Windows Search",
+      "category": "Processes",
+      "description": "Windows Search indexer. Manual saves CPU/disk but makes file search slower and Outlook search less complete.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'WSearch') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WSearch' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'WSearch' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WSearch",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WSearch",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WSearch",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": true,
+      "per_user": false
+    },
+    {
+      "id": "svc_xblauthmanager",
+      "name": "Xbox Live Auth Manager",
+      "category": "Xbox",
+      "description": "Xbox Live Auth Manager; Xbox mode controls its startup (Disabled mode turns it off).",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'XblAuthManager') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'XblAuthManager' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'XblAuthManager' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XblAuthManager",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XblAuthManager",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "XblAuthManager",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Disabled"
+      }
+    },
+    {
+      "id": "svc_xblgamesave",
+      "name": "Xbox Live Game Save",
+      "category": "Xbox",
+      "description": "Xbox Live Game Save; Xbox mode controls its startup (Disabled mode turns it off).",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'XblGameSave') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'XblGameSave' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'XblGameSave' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XblGameSave",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XblGameSave",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "XblGameSave",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Disabled"
+      }
+    },
+    {
+      "id": "svc_xboxnetapisvc",
+      "name": "Xbox Live Networking Service",
+      "category": "Xbox",
+      "description": "Xbox Live Networking Service; Xbox mode controls its startup (Disabled mode turns it off).",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'XboxNetApiSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'XboxNetApiSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'XboxNetApiSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XboxNetApiSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XboxNetApiSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "XboxNetApiSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Disabled"
+      }
+    },
+    {
+      "id": "svc_xboxgipsvc",
+      "name": "Xbox Accessory Management Service",
+      "category": "Xbox",
+      "description": "Xbox Accessory Management Service; Xbox mode controls its startup (Disabled mode turns it off).",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'XboxGipSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'XboxGipSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'XboxGipSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XboxGipSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\XboxGipSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "XboxGipSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Disabled"
+      }
+    },
+    {
+      "id": "svc_gamingservices",
+      "name": "Gaming Services",
+      "category": "Xbox",
+      "description": "Gaming Services: needed by Xbox/Store games; Disabled mode sets it to Manual (not off).",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'GamingServices') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'GamingServices' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'GamingServices' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\GamingServices",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\GamingServices",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "GamingServices",
+      "default_startup": "Automatic",
+      "optimized_startup": "Manual",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Automatic",
+        "Lite": "Automatic",
+        "Disabled": "Manual"
+      }
+    },
+    {
+      "id": "svc_gamingservicesnet",
+      "name": "Gaming Services Net",
+      "category": "Xbox",
+      "description": "Gaming Services networking helper; always on demand.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'GamingServicesNet') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'GamingServicesNet' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'GamingServicesNet' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\GamingServicesNet",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\GamingServicesNet",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "GamingServicesNet",
+      "default_startup": "Manual",
+      "optimized_startup": "Manual",
+      "optional": true,
+      "per_user": false,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Manual"
+      }
+    },
+    {
+      "id": "svc_bcastdvruserservice",
+      "name": "GameDVR and Broadcast User Service",
+      "category": "Xbox",
+      "description": "Game Bar broadcast/capture per-user service; always on demand.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'BcastDVRUserService') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'BcastDVRUserService' -StartupType 'Manual' -IncludeUserInstances",
+      "undo_script": "Set-OptiServiceStartup -Name 'BcastDVRUserService' -StartupType 'Manual' -IncludeUserInstances",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\BcastDVRUserService",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\BcastDVRUserService",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "BcastDVRUserService",
+      "default_startup": "Manual",
+      "optimized_startup": "Manual",
+      "optional": true,
+      "per_user": true,
+      "xbox_modes": {
+        "Enabled": "Manual",
+        "Lite": "Manual",
+        "Disabled": "Manual"
+      }
+    }
+  ]
+}

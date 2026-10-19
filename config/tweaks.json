@@ -1,0 +1,420 @@
+{
+  "version": 1,
+  "tweaks": [
+    {
+      "id": "telemetry",
+      "name": "Minimize telemetry",
+      "category": "Privacy",
+      "description": "Sets the Windows diagnostic data policy to the minimum (Security/required level on supported editions).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'AllowTelemetry' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'AllowTelemetry' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'AllowTelemetry'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "AllowTelemetry"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "activity_history",
+      "name": "Disable activity history",
+      "category": "Privacy",
+      "description": "Stops Windows from recording and uploading your activity timeline.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'EnableActivityFeed' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'PublishUserActivities' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'UploadUserActivities' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'EnableActivityFeed' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'PublishUserActivities' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'UploadUserActivities' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'EnableActivityFeed'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'PublishUserActivities'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System' -Name 'UploadUserActivities'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "EnableActivityFeed"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "PublishUserActivities"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System",
+          "name": "UploadUserActivities"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "app_launch_tracking",
+      "name": "Stop app launch tracking",
+      "category": "Privacy",
+      "description": "Stops Windows tracking which apps you launch to personalize Start and search.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'Start_TrackProgs' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "Start_TrackProgs"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "advertising_id",
+      "name": "Disable advertising ID",
+      "category": "Privacy",
+      "description": "Turns off the per-user advertising ID that apps use for targeted ads.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo' -Name 'Enabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo' -Name 'Enabled' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo' -Name 'Enabled' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo",
+          "name": "Enabled"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "lockscreen_spotlight_ads",
+      "name": "Remove lock screen and Start suggestions",
+      "category": "Privacy",
+      "description": "Disables Spotlight overlay tips, suggested content and promoted app suggestions.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338387Enabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338388Enabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SystemPaneSuggestionsEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338387Enabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338388Enabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SystemPaneSuggestionsEnabled' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'RotatingLockScreenOverlayEnabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338387Enabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338388Enabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SystemPaneSuggestionsEnabled' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "RotatingLockScreenOverlayEnabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338387Enabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338388Enabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SystemPaneSuggestionsEnabled"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "copilot",
+      "name": "Disable Windows Copilot",
+      "category": "AI",
+      "description": "Turns off the Copilot sidebar via policy and hides the taskbar Copilot button.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1) -and (Test-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'ShowCopilotButton' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'ShowCopilotButton' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot'\nRemove-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot' -Name 'TurnOffWindowsCopilot'\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'ShowCopilotButton' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+          "name": "TurnOffWindowsCopilot"
+        },
+        {
+          "path": "HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsCopilot",
+          "name": "TurnOffWindowsCopilot"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "ShowCopilotButton"
+        }
+      ],
+      "requires_restart": "explorer"
+    },
+    {
+      "id": "recall",
+      "name": "Disable Recall snapshots",
+      "category": "AI",
+      "description": "Blocks Recall-style AI data analysis and screen snapshots (no effect on PCs without Recall).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1) -and (Test-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis'\nRemove-OptiRegistry -Path 'HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI' -Name 'DisableAIDataAnalysis'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI",
+          "name": "DisableAIDataAnalysis"
+        },
+        {
+          "path": "HKLM:\\Software\\Policies\\Microsoft\\Windows\\WindowsAI",
+          "name": "DisableAIDataAnalysis"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "widgets",
+      "name": "Disable Widgets",
+      "category": "Processes",
+      "description": "Removes the Widgets board and its background web processes.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh' -Name 'AllowNewsAndInterests' -Value 0)",
+      "apply_script": "try { Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarDa' -Value 0 -Type DWord } catch { Write-OptiLog 'Taskbar Widgets toggle is protected on this Windows build; policy applied instead.' 'Warn' }\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh' -Name 'AllowNewsAndInterests' -Value 0 -Type DWord",
+      "undo_script": "try { Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarDa' -Value 1 -Type DWord } catch { Write-OptiLog 'Taskbar Widgets toggle is protected on this Windows build.' 'Warn' }\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh' -Name 'AllowNewsAndInterests'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "TaskbarDa"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh",
+          "name": "AllowNewsAndInterests"
+        }
+      ],
+      "requires_restart": "explorer"
+    },
+    {
+      "id": "bing_search",
+      "name": "Local-only Start search",
+      "category": "Privacy",
+      "description": "Stops Start menu searches from sending keystrokes to Bing and showing web results.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer' -Name 'DisableSearchBoxSuggestions' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer' -Name 'DisableSearchBoxSuggestions' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer' -Name 'DisableSearchBoxSuggestions'\nRemove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search' -Name 'BingSearchEnabled'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer",
+          "name": "DisableSearchBoxSuggestions"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search",
+          "name": "BingSearchEnabled"
+        }
+      ],
+      "requires_restart": "explorer"
+    },
+    {
+      "id": "svchost_split",
+      "name": "Merge svchost processes",
+      "category": "Processes",
+      "description": "Sets the service-host split threshold to your RAM size so Windows runs fewer svchost.exe processes (fewer processes, slightly less overhead).",
+      "risk_level": "Moderate",
+      "check_script": "$kb = [int64]((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB)\n([int64](Get-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'SvcHostSplitThresholdInKB')) -ge $kb",
+      "apply_script": "$kb = [int64]((Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB)\nSet-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'SvcHostSplitThresholdInKB' -Value $kb -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'SvcHostSplitThresholdInKB' -Value 3670016 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control",
+          "name": "SvcHostSplitThresholdInKB"
+        }
+      ],
+      "requires_restart": "reboot"
+    },
+    {
+      "id": "background_apps",
+      "name": "Block background apps",
+      "category": "Processes",
+      "description": "Prevents Store apps from running in the background for the current user, saving RAM and battery.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications' -Name 'GlobalUserDisabled' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications' -Name 'GlobalUserDisabled' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications' -Name 'GlobalUserDisabled'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications",
+          "name": "GlobalUserDisabled"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "standby_network",
+      "name": "Disable network in standby",
+      "category": "Power",
+      "description": "Turns off network connectivity during Modern Standby so the laptop drains less battery while the lid is closed.",
+      "risk_level": "Moderate",
+      "check_script": "$q = powercfg /q SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 | Out-String\n$m = [regex]::Match($q, 'Current DC Power Setting Index:\\s*(0x[0-9a-fA-F]+)')\n$m.Success -and ([Convert]::ToInt32($m.Groups[1].Value, 16) -eq 0)",
+      "apply_script": "if (-not $WhatIfPreference) {\n  powercfg /setdcvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 0\n  powercfg /setacvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 0\n  powercfg /setactive SCHEME_CURRENT\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  powercfg /setdcvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 1\n  powercfg /setacvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 1\n  powercfg /setactive SCHEME_CURRENT\n}",
+      "registry": [],
+      "requires_restart": "none"
+    },
+    {
+      "id": "delivery_optimization_p2p",
+      "name": "Disable update peer sharing",
+      "category": "Processes",
+      "description": "Stops Windows uploading updates to other PCs over the internet or LAN (downloads only from Microsoft).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Name 'DODownloadMode' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Name 'DODownloadMode' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization' -Name 'DODownloadMode'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization",
+          "name": "DODownloadMode"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "menu_show_delay",
+      "name": "Instant menus",
+      "category": "Responsiveness",
+      "description": "Removes the 400 ms delay before submenus open.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '0')",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '0' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'MenuShowDelay' -Value '400' -Type String",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "MenuShowDelay"
+        }
+      ],
+      "requires_restart": "signout"
+    },
+    {
+      "id": "shutdown_timeouts",
+      "name": "Faster shutdown",
+      "category": "Responsiveness",
+      "description": "Shortens how long Windows waits for services and hung apps to close at shutdown.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'WaitToKillServiceTimeout' -Value '2000') -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'WaitToKillAppTimeout' -Value '2000') -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'HungAppTimeout' -Value '1000')",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'WaitToKillServiceTimeout' -Value '2000' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'WaitToKillAppTimeout' -Value '2000' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'HungAppTimeout' -Value '1000' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control' -Name 'WaitToKillServiceTimeout' -Value '5000' -Type String\nRemove-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'WaitToKillAppTimeout'\nRemove-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'HungAppTimeout'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control",
+          "name": "WaitToKillServiceTimeout"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "WaitToKillAppTimeout"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "HungAppTimeout"
+        }
+      ],
+      "requires_restart": "signout"
+    },
+    {
+      "id": "taskbar_end_task",
+      "name": "Taskbar End Task",
+      "category": "Responsiveness",
+      "description": "Adds an End task entry to the taskbar right-click menu for frozen apps (Windows 11 23H2+).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings' -Name 'TaskbarEndTask' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings' -Name 'TaskbarEndTask' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings' -Name 'TaskbarEndTask'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings",
+          "name": "TaskbarEndTask"
+        }
+      ],
+      "requires_restart": "explorer"
+    },
+    {
+      "id": "classic_context_menu",
+      "name": "Classic right-click menu",
+      "category": "Responsiveness",
+      "description": "Restores the full Windows 10 style context menu instead of the Show more options step.",
+      "risk_level": "Safe",
+      "check_script": "Test-Path -LiteralPath 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32'",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32' -Name '(default)' -Value '' -Type String",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Classes\\CLSID\\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\\InprocServer32",
+          "name": "(default)"
+        }
+      ],
+      "requires_restart": "explorer"
+    },
+    {
+      "id": "transparency",
+      "name": "Disable transparency",
+      "category": "Responsiveness",
+      "description": "Turns off acrylic/mica transparency effects to save GPU and battery.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'EnableTransparency' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'EnableTransparency' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize' -Name 'EnableTransparency' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+          "name": "EnableTransparency"
+        }
+      ],
+      "requires_restart": "none"
+    },
+    {
+      "id": "visual_effects",
+      "name": "Lighter visual effects",
+      "category": "Responsiveness",
+      "description": "Disables window animations and Aero Peek while keeping ClearType font smoothing and thumbnails.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects' -Name 'VisualFXSetting' -Value 3) -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'UserPreferencesMask' -Value ([byte[]](0x90,0x12,0x03,0x80,0x10,0x00,0x00,0x00))) -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop\\WindowMetrics' -Name 'MinAnimate' -Value '0') -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarAnimations' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\DWM' -Name 'EnableAeroPeek' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects' -Name 'VisualFXSetting' -Value 3 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'UserPreferencesMask' -Value ([byte[]](0x90,0x12,0x03,0x80,0x10,0x00,0x00,0x00)) -Type Binary\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop\\WindowMetrics' -Name 'MinAnimate' -Value '0' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarAnimations' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\DWM' -Name 'EnableAeroPeek' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'FontSmoothing' -Value '2' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'IconsOnly' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects' -Name 'VisualFXSetting' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'UserPreferencesMask' -Value ([byte[]](0x9E,0x1E,0x07,0x80,0x12,0x00,0x00,0x00)) -Type Binary\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop\\WindowMetrics' -Name 'MinAnimate' -Value '1' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced' -Name 'TaskbarAnimations' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\DWM' -Name 'EnableAeroPeek' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects",
+          "name": "VisualFXSetting"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "UserPreferencesMask"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Desktop\\WindowMetrics",
+          "name": "MinAnimate"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "TaskbarAnimations"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\DWM",
+          "name": "EnableAeroPeek"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "FontSmoothing"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced",
+          "name": "IconsOnly"
+        }
+      ],
+      "requires_restart": "signout"
+    },
+    {
+      "id": "mouse_acceleration",
+      "name": "Disable mouse acceleration",
+      "category": "Input",
+      "description": "Turns off Enhance pointer precision for consistent 1:1 mouse movement (good for gaming).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseSpeed' -Value '0') -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold1' -Value '0') -and (Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold2' -Value '0')",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseSpeed' -Value '0' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold1' -Value '0' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold2' -Value '0' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseSpeed' -Value '1' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold1' -Value '6' -Type String\nSet-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseThreshold2' -Value '10' -Type String",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Mouse",
+          "name": "MouseSpeed"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Mouse",
+          "name": "MouseThreshold1"
+        },
+        {
+          "path": "HKCU:\\Control Panel\\Mouse",
+          "name": "MouseThreshold2"
+        }
+      ],
+      "requires_restart": "signout"
+    }
+  ]
+}

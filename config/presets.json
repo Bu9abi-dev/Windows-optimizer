@@ -1,0 +1,128 @@
+{
+  "version": 1,
+  "presets": [
+    {
+      "id": "StudentLaptop",
+      "name": "Student Laptop Boost",
+      "description": "Privacy, AI and responsiveness tweaks, bloat removal and cleanup with Xbox services in Lite mode.",
+      "tweaks": [
+        "telemetry",
+        "activity_history",
+        "app_launch_tracking",
+        "advertising_id",
+        "lockscreen_spotlight_ads",
+        "bing_search",
+        "copilot",
+        "recall",
+        "widgets",
+        "menu_show_delay",
+        "shutdown_timeouts",
+        "taskbar_end_task",
+        "classic_context_menu",
+        "transparency",
+        "visual_effects"
+      ],
+      "services": [
+        "svc_diagtrack",
+        "svc_dmwappushservice",
+        "svc_mapsbroker",
+        "svc_fax",
+        "svc_ajrouter",
+        "svc_trkwks",
+        "svc_lfsvc",
+        "svc_wsaifabricsvc"
+      ],
+      "remove_appx": true,
+      "xbox_mode": "Lite",
+      "power_profile": "Balanced",
+      "cleanup": true,
+      "undo_all": false
+    },
+    {
+      "id": "StudyBattery",
+      "name": "Study Battery Saver",
+      "description": "Student Laptop Boost plus background app and standby network savings, Xbox off, study power plan.",
+      "tweaks": [
+        "telemetry",
+        "activity_history",
+        "app_launch_tracking",
+        "advertising_id",
+        "lockscreen_spotlight_ads",
+        "bing_search",
+        "copilot",
+        "recall",
+        "widgets",
+        "menu_show_delay",
+        "shutdown_timeouts",
+        "taskbar_end_task",
+        "classic_context_menu",
+        "transparency",
+        "visual_effects",
+        "background_apps",
+        "standby_network"
+      ],
+      "services": [
+        "svc_diagtrack",
+        "svc_dmwappushservice",
+        "svc_mapsbroker",
+        "svc_fax",
+        "svc_ajrouter",
+        "svc_trkwks",
+        "svc_lfsvc",
+        "svc_wsaifabricsvc"
+      ],
+      "remove_appx": true,
+      "xbox_mode": "Disabled",
+      "power_profile": "Study",
+      "cleanup": true,
+      "undo_all": false
+    },
+    {
+      "id": "GamingXbox",
+      "name": "Gaming / Xbox Ready",
+      "description": "Keeps Xbox features working; applies privacy and responsiveness tweaks, merges svchost and removes mouse acceleration.",
+      "tweaks": [
+        "telemetry",
+        "activity_history",
+        "app_launch_tracking",
+        "advertising_id",
+        "lockscreen_spotlight_ads",
+        "bing_search",
+        "copilot",
+        "recall",
+        "widgets",
+        "menu_show_delay",
+        "shutdown_timeouts",
+        "taskbar_end_task",
+        "classic_context_menu",
+        "visual_effects",
+        "mouse_acceleration",
+        "svchost_split"
+      ],
+      "services": [
+        "svc_diagtrack",
+        "svc_dmwappushservice",
+        "svc_fax",
+        "svc_ajrouter",
+        "svc_mapsbroker"
+      ],
+      "remove_appx": false,
+      "xbox_mode": "Enabled",
+      "power_profile": "Performance",
+      "cleanup": false,
+      "undo_all": false
+    },
+    {
+      "id": "FactoryDefault",
+      "name": "Restore Defaults",
+      "description": "Reverts every tweak and service to the Windows defaults and re-enables Xbox.",
+      "tweaks": [],
+      "services": [],
+      "remove_appx": false,
+      "xbox_mode": "Enabled",
+      "power_profile": "Balanced",
+      "cleanup": false,
+      "undo_all": true
+    }
+  ]
+}
