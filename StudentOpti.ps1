@@ -1,12 +1,16 @@
 <#
 .SYNOPSIS
-  StudentOpti - Windows optimizer for students. GUI by default, CLI with parameters.
+  StudentOpti - Windows optimizer for students. Interactive console menu by default, flags for headless runs, -Gui for the WPF window.
+.EXAMPLE
+  .\StudentOpti.ps1
+.EXAMPLE
+  .\StudentOpti.ps1 -Preset StrongestOptimizer -Yes
 .EXAMPLE
   .\StudentOpti.ps1 -Preset StudentLaptop -XboxMode Lite -Silent
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('StudentLaptop','StudyBattery','GamingXbox','FactoryDefault')]
+    [ValidateSet('LightestWindows','StrongestOptimizer','StudentLaptop','StudyBattery','GamingXbox','FactoryDefault')]
     [string]$Preset,
     [ValidateSet('Enable','Enabled','Lite','Disable','Disabled','Repair')]
     [string]$XboxMode,
@@ -17,29 +21,53 @@ param(
     [switch]$NoRestorePoint,
     [switch]$RestoreSnapshot,
     [switch]$ListTweaks,
-    [switch]$CleanTemp
+    [switch]$CleanTemp,
+    [switch]$Gui,
+    [switch]$NoRestartPrompt,
+    [switch]$Yes,
+    [string[]]$Maintenance
 )
 
 $ErrorActionPreference = 'Stop'
 $script:OptiRoot = $PSScriptRoot
-$script:ModuleFiles = @('Common.ps1','Backup-Manager.ps1','Debloat-Engine.ps1','Process-Optimizer.ps1','Responsiveness-Engine.ps1','Xbox-Controller.ps1')
+$script:ModuleFiles = @('Common.ps1','Backup-Manager.ps1','Debloat-Engine.ps1','Process-Optimizer.ps1','Responsiveness-Engine.ps1')
+if (Test-Path -LiteralPath (Join-Path (Join-Path $script:OptiRoot 'modules') 'Maintenance-Engine.ps1')) { $script:ModuleFiles += 'Maintenance-Engine.ps1' }
+$script:ModuleFiles += 'Xbox-Controller.ps1'
 foreach ($m in $script:ModuleFiles) {
     . (Join-Path (Join-Path $script:OptiRoot 'modules') $m)
 }
+. (Join-Path (Join-Path $script:OptiRoot 'modules') 'Cli.ps1')
 
 if ($DryRun) { $global:WhatIfPreference = $true }
+$global:OptiYes = [bool]$Yes
+if ($NoRestorePoint) { Write-Host 'Restore point is mandatory; -NoRestorePoint is ignored.' -ForegroundColor Yellow }
+$global:OptiNoRestartPrompt = ([bool]$NoRestartPrompt -or [bool]$Silent)
 
-$cliAction = ($Preset -or $XboxMode -or $Tweaks -or $Undo -or $RestoreSnapshot -or $ListTweaks -or $CleanTemp)
+try { $Host.UI.RawUI.WindowTitle = 'StudentOpti' } catch { }
+try {
+    $buf = $Host.UI.RawUI.BufferSize
+    if ($buf.Width -lt 120) {
+        $buf.Width = 120
+        $Host.UI.RawUI.BufferSize = $buf
+    }
+} catch { }
 
-# ---------------------------------------------------------------- CLI
+$cliAction = ($Preset -or $XboxMode -or $Tweaks -or $Undo -or $RestoreSnapshot -or $ListTweaks -or $CleanTemp -or $Maintenance)
+
+# ---------------------------------------------------------------- headless CLI
 function Invoke-OptiCli {
     $fail = $false
-    $mutating = ($Preset -or $XboxMode -or $Tweaks -or $Undo -or $RestoreSnapshot -or $CleanTemp)
+    $mutating = ($Preset -or $XboxMode -or $Tweaks -or $Undo -or $RestoreSnapshot -or $CleanTemp -or $Maintenance)
 
     if ($ListTweaks) {
         $rows = @()
-        foreach ($t in @((Get-OptiConfig -Name tweaks).tweaks)) { $rows += [pscustomobject]@{ Id = $t.id; Category = $t.category; Risk = $t.risk_level; Name = $t.name } }
-        foreach ($t in @((Get-OptiConfig -Name services).services)) { $rows += [pscustomobject]@{ Id = $t.id; Category = $t.category; Risk = $t.risk_level; Name = $t.name } }
+        foreach ($src in @('tweaks','services','tasks')) {
+            foreach ($t in @((Get-OptiConfig -Name $src).$src)) {
+                $tier = ''
+                if ($t.PSObject.Properties['tier']) { $tier = [string]$t.tier }
+                $rows += [pscustomobject]@{ Id = $t.id; Category = $t.category; Risk = $t.risk_level; Tier = $tier; Name = $t.name }
+            }
+        }
         $rows | Sort-Object Category, Id | Format-Table -AutoSize | Out-String -Width 200 | Write-Host
         if (-not $mutating) { return 0 }
     }
@@ -49,37 +77,62 @@ function Invoke-OptiCli {
         return 1
     }
 
-    if ($mutating -and -not $NoRestorePoint -and -not $DryRun) {
-        try { Invoke-OptiSafetyNet } catch { Write-OptiLog -Message "Safety net failed: $($_.Exception.Message)" -Level Warn }
+    Reset-OptiResults
+    if ($DryRun) { Write-Host 'DRY RUN: nothing will be changed.' -ForegroundColor Yellow }
+
+    $gated = ($Preset -or $Tweaks -or $Undo -or $CleanTemp -or $Maintenance -or ($XboxMode -and $XboxMode -ne 'Repair'))
+    if ($gated) {
+        Write-OptiSection 'Safety net'
+        if (-not (Confirm-OptiSafetyNet)) { return 2 }
+        if (-not $DryRun) { Write-Host '  Safety net ready' -ForegroundColor Green }
     }
 
     if ($Preset) {
-        try { Invoke-OptiPreset -Id $Preset -SkipSafetyNet } catch { Write-OptiLog -Message "Preset $Preset failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+        try { Invoke-OptiPreset -Id $Preset } catch { Add-OptiResult -Id $Preset -Name "Preset $Preset" -Status Failed -Message $_.Exception.Message }
     }
     if ($XboxMode) {
-        try {
-            switch ($XboxMode) {
-                'Repair'   { Restore-XboxFallback -Deep }
-                'Enable'   { Set-XboxMode -Mode Enabled }
-                'Disable'  { Set-XboxMode -Mode Disabled }
-                default    { Set-XboxMode -Mode $XboxMode }
-            }
-        } catch { Write-OptiLog -Message "Xbox mode $XboxMode failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+        Write-OptiSection 'Xbox'
+        switch ($XboxMode) {
+            'Repair'   { Invoke-OptiStep -Id 'xbox_repair' -Name 'Xbox deep repair' -Code { Restore-XboxFallback -Deep } }
+            'Enable'   { Invoke-OptiStep -Id 'xbox_mode' -Name 'Xbox mode: Enabled' -Code { Set-XboxMode -Mode Enabled } }
+            'Disable'  { Invoke-OptiStep -Id 'xbox_mode' -Name 'Xbox mode: Disabled' -Code { Set-XboxMode -Mode Disabled } }
+            default    { $xm = $XboxMode; Invoke-OptiStep -Id 'xbox_mode' -Name ('Xbox mode: ' + $xm) -Code { Set-XboxMode -Mode $xm } }
+        }
     }
-    foreach ($id in @($Tweaks)) {
-        if (-not $id) { continue }
-        try { Invoke-OptiTweak -Id $id -Action Apply } catch { Write-OptiLog -Message "Tweak $id failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+    if (@($Tweaks | Where-Object { $_ }).Count -gt 0) {
+        Write-OptiSection ('Tweaks ({0})' -f @($Tweaks | Where-Object { $_ }).Count)
+        foreach ($id in @($Tweaks | Where-Object { $_ })) {
+            if (-not $id) { continue }
+            if ($global:OptiSafetyStop) { break }
+            try { Invoke-OptiTweak -Id $id -Action Apply } catch { Add-OptiResult -Id $id -Action Apply -Status Failed -Message $_.Exception.Message }
+        }
     }
-    foreach ($id in @($Undo)) {
-        if (-not $id) { continue }
-        try { Invoke-OptiTweak -Id $id -Action Undo } catch { Write-OptiLog -Message "Undo $id failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+    if (@($Undo | Where-Object { $_ }).Count -gt 0) {
+        Write-OptiSection ('Undo ({0})' -f @($Undo | Where-Object { $_ }).Count)
+        foreach ($id in @($Undo | Where-Object { $_ })) {
+            if (-not $id) { continue }
+            if ($global:OptiSafetyStop) { break }
+            try { Invoke-OptiTweak -Id $id -Action Undo } catch { Add-OptiResult -Id $id -Action Undo -Status Failed -Message $_.Exception.Message }
+        }
     }
     if ($RestoreSnapshot) {
-        try { Restore-OptiStateSnapshot } catch { Write-OptiLog -Message "Snapshot restore failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+        Write-OptiSection 'Snapshot'
+        Invoke-OptiStep -Id 'restore_snapshot' -Name 'Restore last snapshot' -Code { Restore-OptiStateSnapshot }
     }
     if ($CleanTemp) {
-        try { Clear-OptiTempFiles } catch { Write-OptiLog -Message "Temp cleanup failed: $($_.Exception.Message)" -Level Error; $fail = $true }
+        Write-OptiSection 'Cleanup'
+        Invoke-OptiStep -Id 'cleanup' -Name 'Clean temp files' -Code { Clear-OptiTempFiles }
     }
+    if (@($Maintenance | Where-Object { $_ }).Count -gt 0) {
+        Write-OptiSection 'Disk, RAM & cleanup'
+        if (Get-Command Invoke-OptiMaintenance -ErrorAction SilentlyContinue) {
+            try { Invoke-OptiMaintenance -Actions @($Maintenance | Where-Object { $_ }) } catch { Add-OptiResult -Id 'maintenance' -Name 'Disk, RAM & cleanup' -Status Failed -Message $_.Exception.Message }
+        } else { Add-OptiResult -Id 'maintenance' -Name 'Disk, RAM & cleanup' -Status Failed -Message 'Maintenance-Engine.ps1 not found' }
+    }
+    Show-OptiSummary
+    if (@(Get-OptiResults | Where-Object { $_.Status -eq 'Failed' }).Count -gt 0) { $fail = $true }
+    if (-not $Silent -and -not $NoRestartPrompt) { Request-OptiRestart }
+    if ($global:OptiSafetyStop) { return 2 }
     if ($fail) { return 1 }
     return 0
 }
@@ -95,11 +148,36 @@ if ($Silent) {
     exit 0
 }
 
-# ---------------------------------------------------------------- GUI
+# ---------------------------------------------------------------- interactive menu (default)
+if (-not $Gui) {
+    if (-not $DryRun -and -not (Test-OptiAdmin)) {
+        Write-Host ''
+        Write-Host 'WARNING: StudentOpti is not running as administrator. Changes will fail.' -ForegroundColor Red
+        $ans = Read-Host 'Relaunch elevated now? [Y/N]'
+        if ($ans -match '^\s*[Yy]') {
+            try {
+                $exe = 'powershell.exe'
+                try { $exe = (Get-Process -Id $PID).Path } catch { }
+                $relArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-File',('"{0}"' -f $PSCommandPath))
+                if ($NoRestartPrompt) { $relArgs += '-NoRestartPrompt' }
+                if ($Yes) { $relArgs += '-Yes' }
+                Start-Process -FilePath $exe -ArgumentList $relArgs -Verb RunAs
+                exit 0
+            } catch {
+                Write-Host "Could not relaunch elevated: $($_.Exception.Message)" -ForegroundColor Red
+            }
+        }
+        Write-Host 'Continuing without admin rights (use D in the menu for a dry run).' -ForegroundColor Yellow
+        Start-Sleep -Seconds 2
+    }
+    Show-OptiMainMenu
+    exit 0
+}
+
+# ---------------------------------------------------------------- GUI (-Gui)
 if ([System.Threading.Thread]::CurrentThread.GetApartmentState() -ne 'STA') {
-    $psArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-STA','-File',('"{0}"' -f $PSCommandPath))
+    $psArgs = @('-NoProfile','-ExecutionPolicy','Bypass','-STA','-File',('"{0}"' -f $PSCommandPath),'-Gui')
     if ($DryRun) { $psArgs += '-DryRun' }
-    if ($NoRestorePoint) { $psArgs += '-NoRestorePoint' }
     $p = Start-Process -FilePath 'powershell.exe' -ArgumentList $psArgs -Wait -PassThru
     exit $p.ExitCode
 }
@@ -111,7 +189,7 @@ $script:Sync.Log = New-Object 'System.Collections.Concurrent.ConcurrentQueue[str
 $script:Sync.Busy = 0
 $global:OptiSync = $script:Sync
 $script:Tasks = New-Object System.Collections.ArrayList
-$script:SafetyDone = [bool]$NoRestorePoint
+$script:SafetyDone = $false
 
 $xamlPath = Join-Path (Join-Path $script:OptiRoot 'ui') 'MainWindow.xaml'
 $xamlText = [IO.File]::ReadAllText($xamlPath)
@@ -342,10 +420,10 @@ function Confirm-Gui([string]$Text) {
 }
 
 # ---- button wiring
-$script:ui.BtnPresetStudentLaptop.Add_Click({ if (Confirm-Gui 'Apply the Student Laptop Boost preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: StudentLaptop' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id StudentLaptop -SkipSafetyNet } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
-$script:ui.BtnPresetStudyBattery.Add_Click({ if (Confirm-Gui 'Apply the Study Battery Saver preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: StudyBattery' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id StudyBattery -SkipSafetyNet } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
-$script:ui.BtnPresetGamingXbox.Add_Click({ if (Confirm-Gui 'Apply the Gaming / Xbox Ready preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: GamingXbox' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id GamingXbox -SkipSafetyNet } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
-$script:ui.BtnPresetFactoryDefault.Add_Click({ if (Confirm-Gui 'Restore Windows defaults for everything StudentOpti can change? A restore point is created first.') { Start-OptiTask -Name 'Preset: FactoryDefault' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id FactoryDefault -SkipSafetyNet } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
+$script:ui.BtnPresetStudentLaptop.Add_Click({ if (Confirm-Gui 'Apply the Student Laptop Boost preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: StudentLaptop' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id StudentLaptop } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
+$script:ui.BtnPresetStudyBattery.Add_Click({ if (Confirm-Gui 'Apply the Study Battery Saver preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: StudyBattery' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id StudyBattery } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
+$script:ui.BtnPresetGamingXbox.Add_Click({ if (Confirm-Gui 'Apply the Gaming / Xbox Ready preset? A restore point is created first.') { Start-OptiTask -Name 'Preset: GamingXbox' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id GamingXbox } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
+$script:ui.BtnPresetFactoryDefault.Add_Click({ if (Confirm-Gui 'Restore Windows defaults for everything StudentOpti can change? A restore point is created first.') { Start-OptiTask -Name 'Preset: FactoryDefault' -SafetyNet -ScriptBlock { Invoke-OptiPreset -Id FactoryDefault } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
 $script:ui.BtnRestorePoint.Add_Click({ Start-OptiTask -Name 'Create restore point' -ScriptBlock { New-OptiRestorePoint } })
 $script:ui.BtnRestoreSnapshot.Add_Click({ if (Confirm-Gui 'Restore the most recent StudentOpti snapshot?') { Start-OptiTask -Name 'Restore last snapshot' -ScriptBlock { Restore-OptiStateSnapshot } -OnComplete { Refresh-TweakPanels; Refresh-ServiceGrid; Update-XboxStatus } } })
 

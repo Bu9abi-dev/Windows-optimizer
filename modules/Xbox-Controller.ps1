@@ -349,7 +349,7 @@ function Register-XboxAppxPackages {
     }
 }
 
-function Restore-XboxFallback {
+function Invoke-XboxFallbackCore {
     <#
     .SYNOPSIS
     Emergency re-enable: Xbox services to Manual, start them, re-register Appx, restore GameDVR; -Deep also reinstalls from the Store.
@@ -482,4 +482,16 @@ function Install-XboxEmergencyScript {
             Write-OptiLog -Message "Emergency Xbox script copied to $t" -Level Success
         }
     }
+}
+
+function Restore-XboxFallback {
+    <#
+    .SYNOPSIS
+    Recovery path: runs Invoke-XboxFallbackCore with the mandatory-restore-point gate bypassed, so recovery works even when System Restore is broken.
+    #>
+    [CmdletBinding(SupportsShouldProcess)]
+    param([switch]$Deep)
+    $prev = $global:OptiSafetyBypass
+    $global:OptiSafetyBypass = $true
+    try { Invoke-XboxFallbackCore -Deep:$Deep } finally { $global:OptiSafetyBypass = $prev }
 }

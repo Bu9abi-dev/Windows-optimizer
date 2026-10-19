@@ -15,6 +15,13 @@ BeforeDiscovery {
     foreach ($i in @($s.services)) { $script:ItemCases += @{ File = 'services'; Id = $i.id; Item = $i } }
     $p = Read-JsonFile (Join-Path $script:Root 'config/presets.json')
     $script:PresetCases = @(@($p.presets) | ForEach-Object { @{ Id = $_.id; Preset = $_ } })
+    $tk = Read-JsonFile (Join-Path $script:Root 'config/tasks.json')
+    $script:TaskCases = @(@($tk.tasks) | ForEach-Object { @{ Id = $_.id; Item = $_ } })
+    $script:TierCases = @(
+        @($t.tweaks) | ForEach-Object { @{ File = 'tweaks'; Id = $_.id; Item = $_ } }
+        @($s.services) | ForEach-Object { @{ File = 'services'; Id = $_.id; Item = $_ } }
+        @($tk.tasks) | ForEach-Object { @{ File = 'tasks'; Id = $_.id; Item = $_ } }
+    )
     $script:Ps1Cases = @(Get-ChildItem -LiteralPath $script:Root -Recurse -Filter *.ps1 -File |
         ForEach-Object { @{ Rel = $_.FullName.Substring($script:Root.Length).TrimStart('\', '/'); Path = $_.FullName } })
     $script:WlCases = @('Microsoft.WindowsStore', 'Microsoft.DesktopAppInstaller', 'Microsoft.WindowsCalculator',
@@ -83,6 +90,65 @@ Describe 'Repository scripts' {
     It 'ui/MainWindow.xaml is well-formed XML (when present)' {
         $x = Join-Path $script:Root 'ui/MainWindow.xaml'
         if (Test-Path -LiteralPath $x) { { [xml](Get-Content -LiteralPath $x -Raw) } | Should -Not -Throw }
+    }
+}
+
+Describe 'tasks.json, tiers and preset maintenance' {
+    It 'config/tasks.json parses and defines tasks' {
+        @($script:TaskCases).Count | Should -BeGreaterThan 0
+    }
+
+    It 'task <Id> has all required fields' -ForEach $script:TaskCases {
+        foreach ($p in 'id', 'name', 'category', 'description', 'risk_level', 'tier', 'check_script', 'apply_script', 'undo_script', 'task_path', 'task_name') {
+            $Item.PSObject.Properties.Name | Should -Contain $p
+        }
+        'Safe', 'Moderate', 'Caution' | Should -Contain $Item.risk_level
+    }
+
+    It 'task <Id> scripts parse without errors' -ForEach $script:TaskCases {
+        foreach ($k in 'check_script', 'apply_script', 'undo_script') {
+            $tokens = $null; $errs = $null
+            [void][System.Management.Automation.Language.Parser]::ParseInput([string]$Item.$k, [ref]$tokens, [ref]$errs)
+            @($errs).Count | Should -Be 0 -Because "$k : $(@($errs) | ForEach-Object { $_.Message })"
+        }
+    }
+
+    It '<File>/<Id> has tier core, deep or extreme' -ForEach $script:TierCases {
+        'core', 'deep', 'extreme' | Should -Contain ([string]$Item.tier)
+    }
+
+    It 'ids are unique across tweaks, services and tasks' {
+        $ids = @($script:Tweaks | ForEach-Object { $_.id }) + @($script:Services | ForEach-Object { $_.id }) + @($script:TaskCases | ForEach-Object { $_.Id })
+        $dups = @($ids | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
+        $dups.Count | Should -Be 0 -Because ($dups -join ', ')
+    }
+
+    It 'no task targets WindowsUpdate or Windows Defender and none is ScheduledDefrag' {
+        $bad = @($script:TaskCases | Where-Object { $_.Item.task_path -match 'WindowsUpdate|Windows Defender' -or $_.Item.task_name -eq 'ScheduledDefrag' } | ForEach-Object { $_.Id })
+        $bad.Count | Should -Be 0 -Because ($bad -join ', ')
+    }
+
+    It 'LightestWindows and StrongestOptimizer presets exist' {
+        $ids = @($script:Presets | ForEach-Object { $_.id })
+        $ids | Should -Contain 'LightestWindows'
+        $ids | Should -Contain 'StrongestOptimizer'
+    }
+
+    It 'preset <Id> maintenance ids are all known' -ForEach $script:PresetCases {
+        $allowed = 'disk_optimize', 'deep_clean', 'browser_cache', 'component_cleanup', 'windows_old', 'network_flush', 'ram_trim', 'startup_trim', 'hardware_tuning', 'restore_size'
+        foreach ($m in @($Preset.maintenance)) { if ($m) { $allowed | Should -Contain $m } }
+    }
+
+    It 'StrongestOptimizer plan excludes svc_spooler, svc_sysmain, memory_compression_off and Xbox services' {
+        $sp = @($script:Presets | Where-Object { $_.id -eq 'StrongestOptimizer' })[0]
+        $plan = Get-OptiPresetPlan -Preset $sp
+        $planIds = @(@($plan.TweakIds) + @($plan.ServiceIds) + @($plan.TaskIds))
+        $planIds.Count | Should -BeGreaterThan 0
+        $planIds | Should -Not -Contain 'svc_spooler'
+        $planIds | Should -Not -Contain 'svc_sysmain'
+        $planIds | Should -Not -Contain 'memory_compression_off'
+        $xboxIds = @($script:Services | Where-Object { $_.category -eq 'Xbox' } | ForEach-Object { $_.id })
+        @($planIds | Where-Object { $xboxIds -contains $_ }).Count | Should -Be 0
     }
 }
 

@@ -51,6 +51,7 @@ Removes bloat Appx packages (current user by default, -AllUsers also removes pro
 #>
     [CmdletBinding(SupportsShouldProcess)]
     param([string[]]$Names, [switch]$AllUsers)
+    if (Get-Command Assert-OptiSafetyNet -ErrorAction SilentlyContinue) { Assert-OptiSafetyNet }
     $apps = @(Get-OptiBloatApps)
     if ($Names -and $Names.Count -gt 0) {
         $apps = @($apps | Where-Object {
