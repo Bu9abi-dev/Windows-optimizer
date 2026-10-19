@@ -29,6 +29,18 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+
+# Keep a full record of every run next to the script, and never let an error vanish with the window.
+$script:OptiLastRunLog = Join-Path $PSScriptRoot 'StudentOpti-last-run.log'
+try { Start-Transcript -Path $script:OptiLastRunLog -Force | Out-Null } catch { }
+trap {
+    Write-Host ''
+    Write-Host ('StudentOpti hit an unexpected error: ' + $_.Exception.Message) -ForegroundColor Red
+    if ($_.InvocationInfo) { Write-Host $_.InvocationInfo.PositionMessage -ForegroundColor DarkGray }
+    Write-Host ('Full log: ' + $script:OptiLastRunLog)
+    try { Stop-Transcript | Out-Null } catch { }
+    exit 1
+}
 $script:OptiRoot = $PSScriptRoot
 $script:ModuleFiles = @('Common.ps1','Backup-Manager.ps1','Debloat-Engine.ps1','Process-Optimizer.ps1','Responsiveness-Engine.ps1')
 if (Test-Path -LiteralPath (Join-Path (Join-Path $script:OptiRoot 'modules') 'Maintenance-Engine.ps1')) { $script:ModuleFiles += 'Maintenance-Engine.ps1' }

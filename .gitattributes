@@ -1,2 +1,3 @@
-*.bat text eol=crlf
-*.cmd text eol=crlf
+# Keep Windows batch files byte-for-byte CRLF in the repo and in GitHub ZIP downloads.
+*.bat -text
+*.cmd -text
