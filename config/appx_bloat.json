@@ -1,0 +1,243 @@
+{
+  "version": 1,
+  "safe_to_remove": [
+    {
+      "name": "Clipchamp",
+      "pattern": "Clipchamp.Clipchamp",
+      "category": "Consumer",
+      "description": "Video editor"
+    },
+    {
+      "name": "Bing News",
+      "pattern": "Microsoft.BingNews",
+      "category": "Consumer",
+      "description": "News app"
+    },
+    {
+      "name": "Bing Weather",
+      "pattern": "Microsoft.BingWeather",
+      "category": "Consumer",
+      "description": "Weather app"
+    },
+    {
+      "name": "Bing Search",
+      "pattern": "Microsoft.BingSearch",
+      "category": "Consumer",
+      "description": "Bing search helper"
+    },
+    {
+      "name": "Get Help",
+      "pattern": "Microsoft.GetHelp",
+      "category": "Consumer",
+      "description": "Support contact app"
+    },
+    {
+      "name": "Tips",
+      "pattern": "Microsoft.Getstarted",
+      "category": "Consumer",
+      "description": "Tips app"
+    },
+    {
+      "name": "Solitaire Collection",
+      "pattern": "Microsoft.MicrosoftSolitaireCollection",
+      "category": "Consumer",
+      "description": "Ad-supported card games"
+    },
+    {
+      "name": "People",
+      "pattern": "Microsoft.People",
+      "category": "Consumer",
+      "description": "Contacts app"
+    },
+    {
+      "name": "Feedback Hub",
+      "pattern": "Microsoft.WindowsFeedbackHub",
+      "category": "Consumer",
+      "description": "Feedback app"
+    },
+    {
+      "name": "Groove Music",
+      "pattern": "Microsoft.ZuneMusic",
+      "category": "Consumer",
+      "description": "Media Player/Groove legacy package"
+    },
+    {
+      "name": "Movies and TV",
+      "pattern": "Microsoft.ZuneVideo",
+      "category": "Consumer",
+      "description": "Movies and TV app"
+    },
+    {
+      "name": "Microsoft Teams (personal)",
+      "pattern": "MicrosoftTeams",
+      "category": "Consumer",
+      "description": "Consumer Teams chat; not work/school MSTeams"
+    },
+    {
+      "name": "Cortana",
+      "pattern": "Microsoft.549981C3F5F10",
+      "category": "Consumer",
+      "description": "Retired Cortana app"
+    },
+    {
+      "name": "Maps",
+      "pattern": "Microsoft.WindowsMaps",
+      "category": "Consumer",
+      "description": "Maps app"
+    },
+    {
+      "name": "Mixed Reality Portal",
+      "pattern": "Microsoft.MixedReality.Portal",
+      "category": "Consumer",
+      "description": "VR portal"
+    },
+    {
+      "name": "Skype",
+      "pattern": "Microsoft.SkypeApp",
+      "category": "Consumer",
+      "description": "Consumer Skype"
+    },
+    {
+      "name": "Dev Home",
+      "pattern": "Microsoft.Windows.DevHome",
+      "category": "Consumer",
+      "description": "Developer dashboard"
+    },
+    {
+      "name": "Copilot app",
+      "pattern": "Microsoft.Copilot",
+      "category": "AI",
+      "description": "Copilot AI assistant app"
+    },
+    {
+      "name": "McAfee trial",
+      "pattern": "*McAfee*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "Norton trial",
+      "pattern": "*Norton*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "WildTangent games",
+      "pattern": "*WildTangent*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "King games",
+      "pattern": "king.com.*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "Candy Crush",
+      "pattern": "*CandyCrush*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "Disney",
+      "pattern": "*Disney*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "TikTok",
+      "pattern": "*TikTok*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "Facebook",
+      "pattern": "*Facebook*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    },
+    {
+      "name": "Instagram",
+      "pattern": "*Instagram*",
+      "category": "OEM",
+      "description": "Preinstalled promotional app"
+    }
+  ],
+  "protected_whitelist": [
+    "Microsoft.WindowsStore",
+    "Microsoft.StorePurchaseApp",
+    "Microsoft.DesktopAppInstaller",
+    "Microsoft.WindowsCalculator",
+    "Microsoft.WindowsTerminal",
+    "Microsoft.ScreenSketch",
+    "Microsoft.VP9VideoExtensions",
+    "Microsoft.HEVCVideoExtension",
+    "Microsoft.AV1VideoExtension",
+    "Microsoft.HEIFImageExtension",
+    "Microsoft.WebpImageExtension",
+    "Microsoft.WebMediaExtensions",
+    "Microsoft.RawImageExtension",
+    "Microsoft.MicrosoftOfficeHub",
+    "Microsoft.Office.OneNote",
+    "Microsoft.OutlookForWindows",
+    "MSTeams",
+    "Microsoft.Todos",
+    "Microsoft.WindowsNotepad",
+    "Microsoft.Paint",
+    "Microsoft.Windows.Photos",
+    "Microsoft.WindowsSoundRecorder",
+    "Microsoft.WindowsAlarms",
+    "Microsoft.SecHealthUI",
+    "Microsoft.XboxIdentityProvider",
+    "Microsoft.GamingServices",
+    "Microsoft.VCLibs*",
+    "Microsoft.UI.Xaml*",
+    "Microsoft.NET.Native*",
+    "Microsoft.WindowsAppRuntime*"
+  ],
+  "xbox": [
+    {
+      "name": "Microsoft.GamingApp",
+      "pattern": "Microsoft.GamingApp",
+      "store_id": "9MV0B5HZVK9Z",
+      "description": "Xbox app"
+    },
+    {
+      "name": "Microsoft.XboxGamingOverlay",
+      "pattern": "Microsoft.XboxGamingOverlay",
+      "store_id": "9NZKPSTSNW4P",
+      "description": "Xbox Game Bar"
+    },
+    {
+      "name": "Microsoft.XboxIdentityProvider",
+      "pattern": "Microsoft.XboxIdentityProvider",
+      "store_id": "9WZDNCRD1HKW",
+      "description": "Xbox sign-in provider"
+    },
+    {
+      "name": "Microsoft.GamingServices",
+      "pattern": "Microsoft.GamingServices",
+      "store_id": "9MWPM2CQNLHN",
+      "description": "Gaming Services"
+    },
+    {
+      "name": "Microsoft.XboxSpeechToTextOverlay",
+      "pattern": "Microsoft.XboxSpeechToTextOverlay",
+      "store_id": null,
+      "description": "Xbox speech overlay"
+    },
+    {
+      "name": "Microsoft.Xbox.TCUI",
+      "pattern": "Microsoft.Xbox.TCUI",
+      "store_id": null,
+      "description": "Xbox UI component"
+    },
+    {
+      "name": "Microsoft.XboxGameOverlay",
+      "pattern": "Microsoft.XboxGameOverlay",
+      "store_id": null,
+      "description": "Xbox game overlay"
+    }
+  ]
+}
