@@ -219,7 +219,7 @@ Lists state snapshots in the backup folder, newest first.
     }
 }
 
-function Restore-OptiStateSnapshot {
+function Invoke-OptiStateRestoreCore {
 <#
 .SYNOPSIS
 Restores registry values, service startup and the power scheme from a state snapshot (latest if no path given).
@@ -301,15 +301,79 @@ Restores registry values, service startup and the power scheme from a state snap
 function Invoke-OptiSafetyNet {
 <#
 .SYNOPSIS
-Creates a restore point, state snapshot and hive export once per session.
+Creates the mandatory restore point, state snapshot and hive export once per session; returns $true only if the restore point and snapshot exist.
+#>
+    [CmdletBinding()]
+    param()
+    if ($script:OptiSafetyNetDone) { return $true }
+    if ($WhatIfPreference) {
+        Write-OptiLog -Message 'Dry run: no restore point needed because nothing will be changed.' -Level Info
+        return $true
+    }
+    Write-OptiLog -Message 'Creating mandatory safety net (restore point, state snapshot, registry export)...' -Level Info
+    $started = (Get-Date).AddMinutes(-2)
+    $rpOk = $false
+    $recent = $null
+    if (Get-Command Get-ComputerRestorePoint -ErrorAction SilentlyContinue) {
+        # Reuse a StudentOpti restore point from the last 30 minutes instead of stacking new ones.
+        $recent = @(Get-ComputerRestorePoint -ErrorAction SilentlyContinue | Where-Object { $_.Description -eq 'Pre-StudentOpti Snapshot' }) |
+            Where-Object { try { [Management.ManagementDateTimeConverter]::ToDateTime($_.CreationTime) -ge (Get-Date).AddMinutes(-30) } catch { $false } } |
+            Select-Object -Last 1
+    }
+    if ($recent) {
+        Write-OptiLog -Message 'Using the StudentOpti restore point created in the last 30 minutes.' -Level Info
+        $rpOk = $true
+    } else {
+        $rpOk = [bool](New-OptiRestorePoint)
+    }
+    if (-not $recent -and $rpOk -and (Get-Command Get-ComputerRestorePoint -ErrorAction SilentlyContinue)) {
+        # Checkpoint-Computer can return without creating a point (e.g. throttling), so confirm it exists.
+        $latest = @(Get-ComputerRestorePoint -ErrorAction SilentlyContinue) | Sort-Object SequenceNumber | Select-Object -Last 1
+        $rpOk = $false
+        if ($latest) {
+            try { $rpOk = ([Management.ManagementDateTimeConverter]::ToDateTime($latest.CreationTime) -ge $started) } catch { $rpOk = $false }
+        }
+    }
+    $snapshot = $null
+    try { $snapshot = New-OptiStateSnapshot -Label 'safety-net' } catch { Write-OptiLog -Message "State snapshot failed: $($_.Exception.Message)" -Level Error }
+    try { [void](Export-OptiRegistryHives) } catch { Write-OptiLog -Message "Registry export failed: $($_.Exception.Message)" -Level Warn }
+
+    if (-not $rpOk) {
+        $script:OptiSafetyNetError = 'the System Restore point could not be created or verified. Turn on System Protection for drive C: (Win+R, sysdm.cpl, System Protection tab, Configure, Turn on) and try again.'
+        Write-OptiLog -Message "SAFETY STOP: $($script:OptiSafetyNetError)" -Level Error
+        return $false
+    }
+    if (-not $snapshot -or -not (Test-Path $snapshot)) {
+        $script:OptiSafetyNetError = 'the state snapshot could not be written to the backups folder.'
+        Write-OptiLog -Message "SAFETY STOP: $($script:OptiSafetyNetError)" -Level Error
+        return $false
+    }
+    Write-OptiLog -Message "Safety net ready. Restore point created; snapshot: $snapshot" -Level Success
+    $script:OptiSafetyNetDone = $true
+    return $true
+}
+
+function Assert-OptiSafetyNet {
+<#
+.SYNOPSIS
+Throws unless the mandatory restore point exists for this session (dry runs and emergency/restore paths are exempt).
+#>
+    [CmdletBinding()]
+    param()
+    if ($WhatIfPreference -or $global:OptiSafetyBypass -or $script:OptiSafetyNetDone) { return }
+    if (-not (Invoke-OptiSafetyNet)) {
+        throw "Changes blocked for your safety: $($script:OptiSafetyNetError)"
+    }
+}
+
+function Restore-OptiStateSnapshot {
+<#
+.SYNOPSIS
+Recovery path: restores a state snapshot (latest if -Path omitted) with the mandatory-restore-point gate bypassed.
 #>
     [CmdletBinding(SupportsShouldProcess)]
-    param()
-    if ($script:OptiSafetyNetDone) { return }
-    if (-not $PSCmdlet.ShouldProcess('System', 'Run safety net (restore point, snapshot, hive export)')) { return }
-    Write-OptiLog -Message 'Creating safety net (restore point, snapshot, hive export)...' -Level Info
-    [void](New-OptiRestorePoint)
-    [void](New-OptiStateSnapshot -Label 'safety-net')
-    [void](Export-OptiRegistryHives)
-    $script:OptiSafetyNetDone = $true
+    param([string]$Path)
+    $prev = $global:OptiSafetyBypass
+    $global:OptiSafetyBypass = $true
+    try { Invoke-OptiStateRestoreCore -Path $Path } finally { $global:OptiSafetyBypass = $prev }
 }

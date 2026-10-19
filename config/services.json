@@ -49,7 +49,8 @@
       "default_startup": "Automatic",
       "optimized_startup": "Disabled",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_dmwappushservice",
@@ -75,7 +76,8 @@
       "default_startup": "Manual",
       "optimized_startup": "Disabled",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_mapsbroker",
@@ -101,7 +103,8 @@
       "default_startup": "AutomaticDelayed",
       "optimized_startup": "Disabled",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_fax",
@@ -127,7 +130,8 @@
       "default_startup": "Manual",
       "optimized_startup": "Disabled",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_ajrouter",
@@ -153,7 +157,8 @@
       "default_startup": "Manual",
       "optimized_startup": "Disabled",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_trkwks",
@@ -179,7 +184,8 @@
       "default_startup": "Automatic",
       "optimized_startup": "Manual",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_lfsvc",
@@ -205,7 +211,8 @@
       "default_startup": "Manual",
       "optimized_startup": "Manual",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_wsaifabricsvc",
@@ -231,7 +238,8 @@
       "default_startup": "AutomaticDelayed",
       "optimized_startup": "Manual",
       "optional": false,
-      "per_user": false
+      "per_user": false,
+      "tier": "core"
     },
     {
       "id": "svc_sysmain",
@@ -257,7 +265,8 @@
       "default_startup": "Automatic",
       "optimized_startup": "Disabled",
       "optional": true,
-      "per_user": false
+      "per_user": false,
+      "tier": "extreme"
     },
     {
       "id": "svc_wsearch",
@@ -283,7 +292,8 @@
       "default_startup": "AutomaticDelayed",
       "optimized_startup": "Manual",
       "optional": true,
-      "per_user": false
+      "per_user": false,
+      "tier": "deep"
     },
     {
       "id": "svc_xblauthmanager",
@@ -314,7 +324,8 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Disabled"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_xblgamesave",
@@ -345,7 +356,8 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Disabled"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_xboxnetapisvc",
@@ -376,7 +388,8 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Disabled"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_xboxgipsvc",
@@ -407,7 +420,8 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Disabled"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_gamingservices",
@@ -438,7 +452,8 @@
         "Enabled": "Automatic",
         "Lite": "Automatic",
         "Disabled": "Manual"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_gamingservicesnet",
@@ -469,7 +484,8 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Manual"
-      }
+      },
+      "tier": "core"
     },
     {
       "id": "svc_bcastdvruserservice",
@@ -500,7 +516,629 @@
         "Enabled": "Manual",
         "Lite": "Manual",
         "Disabled": "Manual"
-      }
+      },
+      "tier": "core"
+    },
+    {
+      "id": "svc_wersvc",
+      "name": "Windows Error Reporting",
+      "category": "Services",
+      "description": "Uploads crash reports to Microsoft; disabling stops crash report prompts.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'WerSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WerSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WerSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WerSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WerSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WerSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_retaildemo",
+      "name": "Retail Demo Service",
+      "category": "Services",
+      "description": "Retail store demo mode service; unused on personal PCs.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'RetailDemo') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'RetailDemo' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'RetailDemo' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RetailDemo",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RetailDemo",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "RetailDemo",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "core"
+    },
+    {
+      "id": "svc_remoteregistry",
+      "name": "Remote Registry",
+      "category": "Services",
+      "description": "Lets remote users edit the registry; enforces the default of Disabled.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'RemoteRegistry') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'RemoteRegistry' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'RemoteRegistry' -StartupType 'Disabled'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RemoteRegistry",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\RemoteRegistry",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "RemoteRegistry",
+      "default_startup": "Disabled",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "core"
+    },
+    {
+      "id": "svc_wmpnetworksvc",
+      "name": "Windows Media Player Network Sharing",
+      "category": "Services",
+      "description": "Shares Windows Media Player libraries over the network.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'WMPNetworkSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WMPNetworkSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WMPNetworkSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WMPNetworkSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WMPNetworkSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WMPNetworkSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "core"
+    },
+    {
+      "id": "svc_wisvc",
+      "name": "Windows Insider Service",
+      "category": "Services",
+      "description": "Windows Insider Program support; not needed unless enrolled in Insider builds.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'wisvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'wisvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'wisvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\wisvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\wisvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "wisvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "core"
+    },
+    {
+      "id": "svc_phonesvc",
+      "name": "Phone Service",
+      "category": "Services",
+      "description": "Telephony state management for phone calls; not needed on most laptops.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'PhoneSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'PhoneSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'PhoneSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\PhoneSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\PhoneSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "PhoneSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_wpcmonsvc",
+      "name": "Parental Controls",
+      "category": "Services",
+      "description": "Windows parental controls monitoring; breaks Family Safety restrictions if disabled.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'WpcMonSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WpcMonSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WpcMonSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WpcMonSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WpcMonSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WpcMonSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_semgrsvc",
+      "name": "Payments and NFC/SE Manager",
+      "category": "Services",
+      "description": "Manages NFC payments and secure elements; unused on most laptops.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'SEMgrSvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'SEMgrSvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'SEMgrSvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SEMgrSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SEMgrSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "SEMgrSvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_pcasvc",
+      "name": "Program Compatibility Assistant Service",
+      "category": "Services",
+      "description": "Detects old-program compatibility issues; runs on demand instead of at boot.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'PcaSvc') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'PcaSvc' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'PcaSvc' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\PcaSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\PcaSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "PcaSvc",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_dps",
+      "name": "Diagnostic Policy Service",
+      "category": "Services",
+      "description": "Problem detection for diagnostics; setting it to Manual can break the network troubleshooter.",
+      "risk_level": "Caution",
+      "check_script": "(Get-OptiServiceStartup -Name 'DPS') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'DPS' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'DPS' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\DPS",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\DPS",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "DPS",
+      "default_startup": "Automatic",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_wdiservicehost",
+      "name": "Diagnostic Service Host",
+      "category": "Services",
+      "description": "Host for diagnostics that run in a service context; disables built-in troubleshooters.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'WdiServiceHost') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WdiServiceHost' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WdiServiceHost' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WdiServiceHost",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WdiServiceHost",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WdiServiceHost",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_wdisystemhost",
+      "name": "Diagnostic System Host",
+      "category": "Services",
+      "description": "Host for diagnostics that run in the system context; disables built-in troubleshooters.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'WdiSystemHost') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WdiSystemHost' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WdiSystemHost' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WdiSystemHost",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WdiSystemHost",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WdiSystemHost",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_diagnosticshub_standardcollector_service",
+      "name": "Diagnostics Hub Standard Collector",
+      "category": "Services",
+      "description": "Collects real-time ETW diagnostics for developers; unused by students.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'diagnosticshub.standardcollector.service') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'diagnosticshub.standardcollector.service' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'diagnosticshub.standardcollector.service' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\diagnosticshub.standardcollector.service",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\diagnosticshub.standardcollector.service",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "diagnosticshub.standardcollector.service",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_icssvc",
+      "name": "Windows Mobile Hotspot Service",
+      "category": "Services",
+      "description": "Needed to share your connection as a mobile hotspot; disabling turns the hotspot feature off.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'icssvc') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'icssvc' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'icssvc' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\icssvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\icssvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "icssvc",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_sharedaccess",
+      "name": "Internet Connection Sharing (ICS)",
+      "category": "Services",
+      "description": "Internet Connection Sharing and NAT; disabling breaks sharing your connection and some VM/hotspot setups.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'SharedAccess') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'SharedAccess' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'SharedAccess' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\SharedAccess",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "SharedAccess",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_lmhosts",
+      "name": "TCP/IP NetBIOS Helper",
+      "category": "Services",
+      "description": "NetBIOS over TCP/IP name resolution; only needed for legacy network file sharing.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'lmhosts') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'lmhosts' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'lmhosts' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\lmhosts",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\lmhosts",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "lmhosts",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_spooler",
+      "name": "Print Spooler",
+      "category": "Services",
+      "description": "Print Spooler; disabling it means you LOSE PRINTING (students who print to school or home printers should skip this).",
+      "risk_level": "Caution",
+      "check_script": "(Get-OptiServiceStartup -Name 'Spooler') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'Spooler' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'Spooler' -StartupType 'Automatic'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Spooler",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Spooler",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "Spooler",
+      "default_startup": "Automatic",
+      "optimized_startup": "Disabled",
+      "optional": true,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_edgeupdate",
+      "name": "Microsoft Edge Update Service",
+      "category": "Services",
+      "description": "Background Edge updater; Edge still updates when launched.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'edgeupdate') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'edgeupdate' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'edgeupdate' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\edgeupdate",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\edgeupdate",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "edgeupdate",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_cdpsvc",
+      "name": "Connected Devices Platform Service",
+      "category": "Services",
+      "description": "Connected Devices Platform; setting it to Manual may limit Nearby Sharing and Phone Link.",
+      "risk_level": "Caution",
+      "check_script": "(Get-OptiServiceStartup -Name 'CDPSvc') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'CDPSvc' -StartupType 'Manual'",
+      "undo_script": "Set-OptiServiceStartup -Name 'CDPSvc' -StartupType 'AutomaticDelayed'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CDPSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CDPSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "CDPSvc",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": false,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_cscservice",
+      "name": "Offline Files",
+      "category": "Services",
+      "description": "Offline Files cache for network shares; unused outside corporate networks.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'CscService') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'CscService' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'CscService' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CscService",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\CscService",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "CscService",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "deep"
+    },
+    {
+      "id": "svc_walletservice",
+      "name": "Wallet Service",
+      "category": "Services",
+      "description": "Wallet backend used by payment apps; unused on most PCs.",
+      "risk_level": "Safe",
+      "check_script": "(Get-OptiServiceStartup -Name 'WalletService') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'WalletService' -StartupType 'Disabled' -StopIfDisabled",
+      "undo_script": "Set-OptiServiceStartup -Name 'WalletService' -StartupType 'Manual'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WalletService",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\WalletService",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "WalletService",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": false,
+      "tier": "core"
+    },
+    {
+      "id": "svc_messagingservice",
+      "name": "Messaging Service",
+      "category": "Services",
+      "description": "Per-user SMS/MMS messaging service; disabling affects text messaging features.",
+      "risk_level": "Moderate",
+      "check_script": "(Get-OptiServiceStartup -Name 'MessagingService') -eq 'Disabled'",
+      "apply_script": "Set-OptiServiceStartup -Name 'MessagingService' -StartupType 'Disabled' -StopIfDisabled -IncludeUserInstances",
+      "undo_script": "Set-OptiServiceStartup -Name 'MessagingService' -StartupType 'Manual' -IncludeUserInstances",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\MessagingService",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\MessagingService",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "MessagingService",
+      "default_startup": "Manual",
+      "optimized_startup": "Disabled",
+      "optional": false,
+      "per_user": true,
+      "tier": "extreme"
+    },
+    {
+      "id": "svc_onesyncsvc",
+      "name": "Sync Host",
+      "category": "Services",
+      "description": "Per-user sync of Mail, Calendar and contacts; setting it to Manual may delay Mail/Calendar sync.",
+      "risk_level": "Caution",
+      "check_script": "(Get-OptiServiceStartup -Name 'OneSyncSvc') -eq 'Manual'",
+      "apply_script": "Set-OptiServiceStartup -Name 'OneSyncSvc' -StartupType 'Manual' -IncludeUserInstances",
+      "undo_script": "Set-OptiServiceStartup -Name 'OneSyncSvc' -StartupType 'AutomaticDelayed' -IncludeUserInstances",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\OneSyncSvc",
+          "name": "Start"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\OneSyncSvc",
+          "name": "DelayedAutostart"
+        }
+      ],
+      "requires_restart": "none",
+      "service": "OneSyncSvc",
+      "default_startup": "AutomaticDelayed",
+      "optimized_startup": "Manual",
+      "optional": false,
+      "per_user": true,
+      "tier": "extreme"
     }
   ]
 }

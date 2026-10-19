@@ -26,11 +26,17 @@ function Write-OptiLog {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory, Position = 0)][AllowEmptyString()][string]$Message,
-        [ValidateSet('Info', 'Warn', 'Error', 'Success')][string]$Level = 'Info'
+        [Parameter(Position = 1)][ValidateSet('Info', 'Warn', 'Error', 'Success')][string]$Level = 'Info',
+        [switch]$NoHost
     )
     $line = '{0} [{1}] {2}' -f (Get-Date -Format 'yyyy-MM-dd HH:mm:ss'), $Level.ToUpper(), $Message
-    $color = switch ($Level) { 'Warn' { 'Yellow' } 'Error' { 'Red' } 'Success' { 'Green' } default { 'Gray' } }
-    try { Write-Host $line -ForegroundColor $color } catch { }
+    if (-not $NoHost) {
+        $color = switch ($Level) { 'Warn' { 'Yellow' } 'Error' { 'Red' } 'Success' { 'Green' } default { 'DarkGray' } }
+        $screen = '  ' + $Message
+        if ($Level -eq 'Warn') { $screen = '  [WARN] ' + $Message }
+        elseif ($Level -eq 'Error') { $screen = '  [ERROR] ' + $Message }
+        try { Write-Host $screen -ForegroundColor $color } catch { }
+    }
     try {
         $logDir = Join-Path (Get-OptiDataDir) 'logs'
         [void][IO.Directory]::CreateDirectory($logDir)
@@ -53,11 +59,18 @@ function Test-OptiAdmin {
 
 function Get-OptiConfig {
     [CmdletBinding()]
-    param([Parameter(Mandatory)][ValidateSet('tweaks', 'services', 'appx_bloat', 'presets')][string]$Name)
+    param([Parameter(Mandatory)][ValidateSet('tweaks', 'services', 'tasks', 'appx_bloat', 'presets')][string]$Name)
     if (-not $script:OptiConfigCache) { $script:OptiConfigCache = @{} }
     if ($script:OptiConfigCache.ContainsKey($Name)) { return $script:OptiConfigCache[$Name] }
     $path = Join-Path (Join-Path (Get-OptiRoot) 'config') ($Name + '.json')
-    if (-not (Test-Path -LiteralPath $path)) { throw "Config file not found: $path" }
+    if (-not (Test-Path -LiteralPath $path)) {
+        if ($Name -eq 'tasks') {
+            $empty = [pscustomobject]@{ version = 1; tasks = @() }
+            $script:OptiConfigCache[$Name] = $empty
+            return $empty
+        }
+        throw "Config file not found: $path"
+    }
     $raw = [IO.File]::ReadAllText($path)
     $obj = $raw | ConvertFrom-Json
     $script:OptiConfigCache[$Name] = $obj
@@ -82,6 +95,7 @@ function Set-OptiRegistry {
         [Parameter(Mandatory)][AllowEmptyString()][AllowNull()]$Value,
         [ValidateSet('String', 'DWord', 'QWord', 'Binary', 'ExpandString')][string]$Type = 'String'
     )
+    if (Get-Command Assert-OptiSafetyNet -ErrorAction SilentlyContinue) { Assert-OptiSafetyNet }
     if (-not $PSCmdlet.ShouldProcess("$Path\$Name", "Set $Type = $Value")) { return }
     if (-not (Test-Path -LiteralPath $Path)) {
         New-Item -Path $Path -Force -ErrorAction Stop | Out-Null
@@ -99,24 +113,28 @@ function Set-OptiRegistry {
         'ExpandString' { $Value = [string]$Value }
     }
     New-ItemProperty -LiteralPath $Path -Name $Name -Value $Value -PropertyType $Type -Force -ErrorAction Stop | Out-Null
+    $global:OptiChangesMade = $true
     Write-OptiLog "Registry set: $Path\$Name ($Type)" 'Info'
 }
 
 function Remove-OptiRegistry {
     [CmdletBinding(SupportsShouldProcess)]
     param([Parameter(Mandatory)][string]$Path, [string]$Name)
+    if (Get-Command Assert-OptiSafetyNet -ErrorAction SilentlyContinue) { Assert-OptiSafetyNet }
     if ($PSBoundParameters.ContainsKey('Name') -and $Name -ne $null -and $Name -ne '') {
         if (-not (Test-Path -LiteralPath $Path)) { return }
         $exists = $null -ne (Get-ItemProperty -LiteralPath $Path -Name $Name -ErrorAction SilentlyContinue)
         if (-not $exists) { return }
         if ($PSCmdlet.ShouldProcess("$Path\$Name", 'Remove registry value')) {
             Remove-ItemProperty -LiteralPath $Path -Name $Name -Force -ErrorAction SilentlyContinue
+            $global:OptiChangesMade = $true
             Write-OptiLog "Registry value removed: $Path\$Name" 'Info'
         }
     } else {
         if (-not (Test-Path -LiteralPath $Path)) { return }
         if ($PSCmdlet.ShouldProcess($Path, 'Remove registry key')) {
             Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction SilentlyContinue
+            $global:OptiChangesMade = $true
             Write-OptiLog "Registry key removed: $Path" 'Info'
         }
     }
@@ -186,6 +204,7 @@ function Set-OptiServiceStartup {
     if ((Get-OptiProtectedServices) -contains $Name -and ($StartupType -eq 'Manual' -or $StartupType -eq 'Disabled')) {
         throw "Service '$Name' is protected and cannot be set to $StartupType."
     }
+    if (Get-Command Assert-OptiSafetyNet -ErrorAction SilentlyContinue) { Assert-OptiSafetyNet }
     $base = 'HKLM:\SYSTEM\CurrentControlSet\Services'
     $targets = New-Object System.Collections.ArrayList
     if (Test-Path -LiteralPath "$base\$Name") { [void]$targets.Add($Name) }
@@ -215,6 +234,7 @@ function Set-OptiServiceStartup {
                 Set-OptiRegistry -Path $key -Name 'DelayedAutostart' -Value 0 -Type DWord
             }
         }
+        $global:OptiChangesMade = $true
         Write-OptiLog "Service $t startup -> $StartupType" 'Info'
         if ($StartupType -eq 'Disabled' -and $StopIfDisabled) {
             try {
@@ -234,12 +254,64 @@ function Invoke-OptiScript {
 function Find-OptiItem {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$Id)
-    foreach ($src in @('tweaks', 'services')) {
+    foreach ($src in @('tweaks', 'services', 'tasks')) {
         $cfg = Get-OptiConfig -Name $src
-        $list = if ($src -eq 'tweaks') { $cfg.tweaks } else { $cfg.services }
-        foreach ($it in @($list)) { if ($it.id -eq $Id) { return $it } }
+        $list = @($cfg.$src)
+        foreach ($it in $list) { if ($it.id -eq $Id) { return $it } }
     }
     return $null
+}
+
+# ---------------------------------------------------------------- result tracking
+function Reset-OptiResults {
+    [CmdletBinding()] param()
+    $global:OptiResults = New-Object System.Collections.ArrayList
+    $global:OptiChangesMade = $false
+    $global:OptiSafetyStop = $false
+    $global:OptiStartTime = Get-Date
+}
+
+function Add-OptiResult {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)][string]$Id,
+        [string]$Name,
+        [string]$Action = 'Apply',
+        [Parameter(Mandatory)][ValidateSet('Applied', 'Undone', 'Skipped', 'Failed', 'DryRun')][string]$Status,
+        [string]$Message = ''
+    )
+    if ($null -eq $global:OptiResults) { $global:OptiResults = New-Object System.Collections.ArrayList }
+    if (-not $Name) { $Name = $Id }
+    $r = [pscustomobject]@{ Id = $Id; Name = $Name; Action = $Action; Status = $Status; Message = $Message; Time = (Get-Date) }
+    [void]$global:OptiResults.Add($r)
+    Write-OptiResultLine -Result $r
+    return
+}
+
+function Get-OptiResults {
+    [CmdletBinding()] param()
+    if ($null -eq $global:OptiResults) { return @() }
+    return @($global:OptiResults)
+}
+
+function Write-OptiResultLine {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)]$Result)
+    $tag = '[ OK ]'; $color = 'Green'
+    switch ([string]$Result.Status) {
+        'Undone'  { $tag = '[UNDO]'; $color = 'Cyan' }
+        'Skipped' { $tag = '[SKIP]'; $color = 'DarkGray' }
+        'Failed'  { $tag = '[FAIL]'; $color = 'Red' }
+        'DryRun'  { $tag = '[DRY ]'; $color = 'Yellow' }
+    }
+    try {
+        Write-Host $tag -ForegroundColor $color -NoNewline
+        Write-Host (' ' + $Result.Name) -NoNewline
+        if ($Result.Message) { Write-Host ('  ' + $Result.Message) -ForegroundColor DarkGray } else { Write-Host '' }
+    } catch { }
+    $lvl = 'Info'
+    if ($Result.Status -eq 'Failed') { $lvl = 'Error' }
+    Write-OptiLog -Message ('{0} {1} {2}: {3} {4}' -f $tag, $Result.Id, $Result.Action, $Result.Name, $Result.Message) -Level $lvl -NoHost
 }
 
 function Invoke-OptiTweak {
@@ -250,29 +322,163 @@ function Invoke-OptiTweak {
     )
     $item = Find-OptiItem -Id $Id
     if (-not $item) { throw "Unknown tweak id: $Id" }
-    switch ($Action) {
-        'Check' {
-            try {
-                $r = @(Invoke-OptiScript -Code $item.check_script)
-                if ($r.Count -eq 0) { return $false }
-                return [bool]$r[$r.Count - 1]
-            } catch {
-                Write-OptiLog "Check failed for ${Id}: $($_.Exception.Message)" 'Warn'
-                return $false
+
+    $doCheck = {
+        try {
+            $r = @(Invoke-OptiScript -Code $item.check_script)
+            if ($r.Count -eq 0) { return $false }
+            return [bool]$r[$r.Count - 1]
+        } catch {
+            Write-OptiLog -Message "Check failed for ${Id}: $($_.Exception.Message)" -Level Warn -NoHost
+            return $false
+        }
+    }
+
+    if ($Action -eq 'Check') { return (& $doCheck) }
+
+    if ($global:OptiSafetyStop) { return }
+    if (Get-Command Assert-OptiSafetyNet -ErrorAction SilentlyContinue) {
+        try { Assert-OptiSafetyNet }
+        catch {
+            $global:OptiSafetyStop = $true
+            Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status Failed -Message $_.Exception.Message
+            return
+        }
+    }
+
+    $isApply = ($Action -eq 'Apply')
+    $code = $item.undo_script
+    $okStatus = 'Undone'
+    if ($isApply) { $code = $item.apply_script; $okStatus = 'Applied' }
+    $needsRestart = $false
+    if ($item.PSObject.Properties['requires_restart'] -and $item.requires_restart -and [string]$item.requires_restart -ne 'none') { $needsRestart = $true }
+
+    $before = [bool](& $doCheck)
+    if ($isApply -and $before) { Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status Skipped -Message 'already applied'; return }
+    if ((-not $isApply) -and (-not $before)) { Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status Skipped -Message 'already at default'; return }
+
+    try {
+        Write-OptiLog -Message "$Action : $($item.name) [$Id]" -Level Info -NoHost
+        Invoke-OptiScript -Code $code | Out-Null
+    } catch {
+        Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status Failed -Message $_.Exception.Message
+        return
+    }
+    if ($WhatIfPreference) {
+        $msg = 'would apply'
+        if (-not $isApply) { $msg = 'would revert' }
+        Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status DryRun -Message $msg
+        return
+    }
+    $global:OptiChangesMade = $true
+    $after = [bool](& $doCheck)
+    if ($isApply) { $verified = $after } else { $verified = (-not $after) }
+    if ($verified) {
+        $m = ''
+        if ($needsRestart) { $m = 'takes effect after restart' }
+        Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status $okStatus -Message $m
+    } elseif ($needsRestart) {
+        Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status $okStatus -Message 'takes effect after restart'
+    } else {
+        $m = 'check still false after apply'
+        if (-not $isApply) { $m = 'check still true after undo' }
+        Add-OptiResult -Id $Id -Name $item.name -Action $Action -Status Failed -Message $m
+    }
+}
+
+function Get-OptiPresetPlan {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)]$Preset)
+    $tweakCfg = Get-OptiConfig -Name tweaks
+    $svcCfg = Get-OptiConfig -Name services
+    $taskCfg = Get-OptiConfig -Name tasks
+    $tweakIds = New-Object System.Collections.ArrayList
+    $svcIds = New-Object System.Collections.ArrayList
+    $taskIds = New-Object System.Collections.ArrayList
+
+    if ($Preset.undo_all) {
+        foreach ($t in @($tweakCfg.tweaks)) { [void]$tweakIds.Add([string]$t.id) }
+        foreach ($t in @($svcCfg.services)) { if ($t.category -ne 'Xbox') { [void]$svcIds.Add([string]$t.id) } }
+        foreach ($t in @($taskCfg.tasks)) { [void]$taskIds.Add([string]$t.id) }
+    } else {
+        $explicit = @{}
+        $addExplicit = {
+            param($List, $Ids)
+            foreach ($i in @($Ids)) {
+                if ($i -and -not $List.Contains([string]$i)) { [void]$List.Add([string]$i) }
+                if ($i) { $explicit[[string]$i] = $true }
             }
         }
-        'Apply' {
-            if (-not $PSCmdlet.ShouldProcess($item.name, 'Apply')) { return }
-            Write-OptiLog "Applying: $($item.name) [$Id]" 'Info'
-            try { Invoke-OptiScript -Code $item.apply_script | Out-Null; Write-OptiLog "Applied: $($item.name)" 'Success' }
-            catch { Write-OptiLog "Apply failed for ${Id}: $($_.Exception.Message)" 'Error'; throw }
+        & $addExplicit $tweakIds $Preset.tweaks
+        & $addExplicit $svcIds $Preset.services
+        $presetTasks = @()
+        if ($Preset.PSObject.Properties['tasks']) { $presetTasks = @($Preset.tasks) }
+        & $addExplicit $taskIds $presetTasks
+        $tiers = @()
+        if ($Preset.PSObject.Properties['tiers']) { $tiers = @($Preset.tiers | Where-Object { $_ }) }
+        if ($tiers.Count -gt 0) {
+            $pick = {
+                param($List, $Items, [bool]$SkipXbox)
+                foreach ($it in @($Items)) {
+                    if (-not $it.PSObject.Properties['tier']) { continue }
+                    if ($tiers -notcontains [string]$it.tier) { continue }
+                    if ($SkipXbox -and $it.category -eq 'Xbox') { continue }
+                    $isOpt = $false
+                    if ($it.PSObject.Properties['optional']) { $isOpt = [bool]$it.optional }
+                    if ($isOpt -and -not $explicit.ContainsKey([string]$it.id)) { continue }
+                    if (-not $List.Contains([string]$it.id)) { [void]$List.Add([string]$it.id) }
+                }
+            }
+            & $pick $tweakIds $tweakCfg.tweaks $false
+            & $pick $svcIds $svcCfg.services $true
+            & $pick $taskIds $taskCfg.tasks $false
         }
-        'Undo' {
-            if (-not $PSCmdlet.ShouldProcess($item.name, 'Undo')) { return }
-            Write-OptiLog "Reverting: $($item.name) [$Id]" 'Info'
-            try { Invoke-OptiScript -Code $item.undo_script | Out-Null; Write-OptiLog "Reverted: $($item.name)" 'Success' }
-            catch { Write-OptiLog "Undo failed for ${Id}: $($_.Exception.Message)" 'Error'; throw }
-        }
+    }
+    [pscustomobject]@{
+        TweakIds = @($tweakIds); ServiceIds = @($svcIds); TaskIds = @($taskIds)
+    }
+}
+
+function Confirm-OptiSafetyNet {
+    # Mandatory gate: restore point + snapshot must exist before any change. Returns $true when safe to proceed.
+    [CmdletBinding()] param()
+    $reason = ''
+    if (Get-Command Invoke-OptiSafetyNet -ErrorAction SilentlyContinue) {
+        $ok = $false
+        try { $ok = [bool](@(Invoke-OptiSafetyNet)[-1]) } catch { $ok = $false; $script:OptiSafetyNetError = $_.Exception.Message }
+        if ($ok) { return $true }
+        $reason = [string]$script:OptiSafetyNetError
+    } else {
+        $reason = 'the backup module is not loaded.'
+    }
+    $global:OptiSafetyStop = $true
+    $bar = '+' + ('-' * 70) + '+'
+    Write-Host ''
+    Write-Host $bar -ForegroundColor Red
+    Write-Host '|  SAFETY STOP - nothing was changed' -ForegroundColor Red
+    Write-Host ('|  Reason: ' + $reason) -ForegroundColor Red
+    Write-Host '|  A restore point is required before any change.' -ForegroundColor Red
+    Write-Host $bar -ForegroundColor Red
+    Write-Host ''
+    return $false
+}
+
+function Write-OptiSection {
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Title)
+    try { Write-Host ''; Write-Host ('== ' + $Title + ' ==') -ForegroundColor Cyan } catch { }
+}
+
+function Invoke-OptiStep {
+    # Runs a one-off phase (apps, xbox, power, cleanup) and records one result for it.
+    [CmdletBinding()]
+    param([Parameter(Mandatory)][string]$Id, [Parameter(Mandatory)][string]$Name, [Parameter(Mandatory)][scriptblock]$Code)
+    try {
+        & $Code | Out-Null
+        if ($WhatIfPreference) { Add-OptiResult -Id $Id -Name $Name -Status DryRun -Message 'would run' }
+        else { $global:OptiChangesMade = $true; Add-OptiResult -Id $Id -Name $Name -Status Applied }
+    } catch {
+        Add-OptiResult -Id $Id -Name $Name -Status Failed -Message $_.Exception.Message
     }
 }
 
@@ -283,65 +489,73 @@ function Invoke-OptiPreset {
     foreach ($p in @((Get-OptiConfig -Name presets).presets)) { if ($p.id -eq $Id) { $preset = $p } }
     if (-not $preset) { throw "Unknown preset: $Id" }
     # No ShouldProcess gate here: each step honours -WhatIf itself, so a dry run previews every change.
-    Write-OptiLog "Running preset: $($preset.name)" 'Info'
+    Write-Host ''
+    Write-Host ('Running preset: ' + $preset.name) -ForegroundColor White
+    Write-OptiLog -Message "Running preset: $($preset.name)" -Level Info -NoHost
 
-    if (-not $SkipSafetyNet) {
-        if (Get-Command Invoke-OptiSafetyNet -ErrorAction SilentlyContinue) {
-            try { Invoke-OptiSafetyNet } catch { Write-OptiLog "Safety net failed: $($_.Exception.Message)" 'Warn' }
-        } else { Write-OptiLog 'Invoke-OptiSafetyNet unavailable; continuing without backup.' 'Warn' }
-    }
+    # The restore point is mandatory; -SkipSafetyNet is accepted for compatibility but cannot bypass the gate.
+    Write-OptiSection 'Safety net'
+    if (-not (Confirm-OptiSafetyNet)) { return }
+    if (-not $WhatIfPreference) { Write-Host '  Safety net ready' -ForegroundColor Green }
 
     $action = 'Apply'
-    $tweakIds = @($preset.tweaks)
-    $svcIds = @($preset.services)
-    if ($preset.undo_all) {
-        $action = 'Undo'
-        $tweakIds = @((Get-OptiConfig -Name tweaks).tweaks | ForEach-Object { $_.id })
-        $svcIds = @((Get-OptiConfig -Name services).services | ForEach-Object { $_.id })
-    }
+    if ($preset.undo_all) { $action = 'Undo' }
+    $plan = Get-OptiPresetPlan -Preset $preset
 
-    foreach ($tid in $tweakIds) {
-        if (-not $tid) { continue }
-        try { Invoke-OptiTweak -Id $tid -Action $action } catch { Write-OptiLog "Tweak $tid failed: $($_.Exception.Message)" 'Warn' }
-    }
-
-    if ($svcIds.Count -gt 0) {
-        if (Get-Command Invoke-OptiServiceOptimization -ErrorAction SilentlyContinue) {
-            try {
-                if ($preset.undo_all) { Invoke-OptiServiceOptimization -Ids $svcIds -Revert }
-                else { Invoke-OptiServiceOptimization -Ids $svcIds }
-            } catch { Write-OptiLog "Service optimization failed: $($_.Exception.Message)" 'Warn' }
-        } else {
-            foreach ($sid in $svcIds) {
-                if (-not $sid) { continue }
-                try { Invoke-OptiTweak -Id $sid -Action $action } catch { Write-OptiLog "Service $sid failed: $($_.Exception.Message)" 'Warn' }
-            }
+    $phases = @(
+        @{ Title = 'Tweaks'; Ids = $plan.TweakIds },
+        @{ Title = 'Services'; Ids = $plan.ServiceIds },
+        @{ Title = 'Scheduled tasks'; Ids = $plan.TaskIds }
+    )
+    foreach ($ph in $phases) {
+        $ids = @($ph.Ids)
+        Write-OptiSection ('{0} ({1})' -f $ph.Title, $ids.Count)
+        foreach ($tid in $ids) {
+            if (-not $tid) { continue }
+            if ($global:OptiSafetyStop) { break }
+            try { Invoke-OptiTweak -Id $tid -Action $action }
+            catch { Add-OptiResult -Id $tid -Action $action -Status Failed -Message $_.Exception.Message }
         }
     }
 
     if ($preset.remove_appx) {
+        Write-OptiSection 'Apps'
         if (Get-Command Remove-OptiBloatApps -ErrorAction SilentlyContinue) {
-            try { Remove-OptiBloatApps } catch { Write-OptiLog "Appx removal failed: $($_.Exception.Message)" 'Warn' }
+            Invoke-OptiStep -Id 'remove_appx' -Name 'Remove bloat apps' -Code { Remove-OptiBloatApps }
         } else { Write-OptiLog 'Remove-OptiBloatApps unavailable; skipped.' 'Warn' }
     }
 
     if ($preset.xbox_mode) {
+        Write-OptiSection 'Xbox'
         if (Get-Command Set-XboxMode -ErrorAction SilentlyContinue) {
-            try { Set-XboxMode -Mode ([string]$preset.xbox_mode) } catch { Write-OptiLog "Xbox mode failed: $($_.Exception.Message)" 'Warn' }
+            $xm = [string]$preset.xbox_mode
+            Invoke-OptiStep -Id 'xbox_mode' -Name ('Xbox mode: ' + $xm) -Code { Set-XboxMode -Mode $xm }
         } else { Write-OptiLog 'Set-XboxMode unavailable; skipped.' 'Warn' }
     }
 
     if ($preset.power_profile) {
+        Write-OptiSection 'Power'
         if (Get-Command Set-OptiPowerProfile -ErrorAction SilentlyContinue) {
-            try { Set-OptiPowerProfile -Profile ([string]$preset.power_profile) } catch { Write-OptiLog "Power profile failed: $($_.Exception.Message)" 'Warn' }
+            $pp = [string]$preset.power_profile
+            Invoke-OptiStep -Id 'power_profile' -Name ('Power profile: ' + $pp) -Code { Set-OptiPowerProfile -Profile $pp }
         } else { Write-OptiLog 'Set-OptiPowerProfile unavailable; skipped.' 'Warn' }
     }
 
+    $maint = @()
+    if ($preset.PSObject.Properties['maintenance']) { $maint = @($preset.maintenance | Where-Object { $_ }) }
+    if ($maint.Count -gt 0 -and (Get-Command Invoke-OptiMaintenance -ErrorAction SilentlyContinue)) {
+        Write-OptiSection 'Disk, RAM & cleanup'
+        try { Invoke-OptiMaintenance -Actions $maint }
+        catch { Add-OptiResult -Id 'maintenance' -Name 'Disk, RAM & cleanup' -Status Failed -Message $_.Exception.Message }
+    }
+
     if ($preset.cleanup) {
+        Write-OptiSection 'Cleanup'
         if (Get-Command Clear-OptiTempFiles -ErrorAction SilentlyContinue) {
-            try { Clear-OptiTempFiles } catch { Write-OptiLog "Cleanup failed: $($_.Exception.Message)" 'Warn' }
+            Invoke-OptiStep -Id 'cleanup' -Name 'Clean temp files' -Code { Clear-OptiTempFiles }
         } else { Write-OptiLog 'Clear-OptiTempFiles unavailable; skipped.' 'Warn' }
     }
 
+    Write-Host ''
     Write-OptiLog "Preset complete: $($preset.name)" 'Success'
 }

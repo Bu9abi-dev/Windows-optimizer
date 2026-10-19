@@ -2,6 +2,64 @@
   "version": 1,
   "presets": [
     {
+      "id": "LightestWindows",
+      "name": "Lightest Windows",
+      "description": "Maximum debloat and background trimming for low-end laptops: every core and deep tweak, service and scheduled task, bloat apps removed, Xbox hibernated (one-click fallback), disk TRIM/defrag, deep cleanup, RAM trim and startup trimming. Skips the Caution-level extreme tweaks.",
+      "tweaks": [],
+      "services": [],
+      "tasks": [],
+      "tiers": [
+        "core",
+        "deep"
+      ],
+      "remove_appx": true,
+      "xbox_mode": "Disabled",
+      "power_profile": "Balanced",
+      "cleanup": false,
+      "maintenance": [
+        "disk_optimize",
+        "deep_clean",
+        "browser_cache",
+        "component_cleanup",
+        "network_flush",
+        "ram_trim",
+        "startup_trim",
+        "hardware_tuning",
+        "restore_size"
+      ],
+      "undo_all": false
+    },
+    {
+      "id": "StrongestOptimizer",
+      "name": "Strongest Optimizer",
+      "description": "Everything: all core, deep and extreme (Caution) tweaks, services and tasks, bloat removal, Ultimate Performance power plan, Xbox Lite, full disk/RAM/cleanup including component store and Windows.old removal. Meant for plugged-in use; read the Caution list before confirming.",
+      "tweaks": [],
+      "services": [],
+      "tasks": [],
+      "tiers": [
+        "core",
+        "deep",
+        "extreme"
+      ],
+      "remove_appx": true,
+      "xbox_mode": "Lite",
+      "power_profile": "Performance",
+      "cleanup": false,
+      "maintenance": [
+        "disk_optimize",
+        "deep_clean",
+        "browser_cache",
+        "component_cleanup",
+        "network_flush",
+        "ram_trim",
+        "startup_trim",
+        "hardware_tuning",
+        "restore_size",
+        "windows_old"
+      ],
+      "undo_all": false
+    },
+    {
       "id": "StudentLaptop",
       "name": "Student Laptop Boost",
       "description": "Privacy, AI and responsiveness tweaks, bloat removal and cleanup with Xbox services in Lite mode.",
@@ -36,7 +94,9 @@
       "xbox_mode": "Lite",
       "power_profile": "Balanced",
       "cleanup": true,
-      "undo_all": false
+      "undo_all": false,
+      "tasks": [],
+      "maintenance": []
     },
     {
       "id": "StudyBattery",
@@ -75,7 +135,9 @@
       "xbox_mode": "Disabled",
       "power_profile": "Study",
       "cleanup": true,
-      "undo_all": false
+      "undo_all": false,
+      "tasks": [],
+      "maintenance": []
     },
     {
       "id": "GamingXbox",
@@ -110,7 +172,9 @@
       "xbox_mode": "Enabled",
       "power_profile": "Performance",
       "cleanup": false,
-      "undo_all": false
+      "undo_all": false,
+      "tasks": [],
+      "maintenance": []
     },
     {
       "id": "FactoryDefault",
@@ -122,7 +186,9 @@
       "xbox_mode": "Enabled",
       "power_profile": "Balanced",
       "cleanup": false,
-      "undo_all": true
+      "undo_all": true,
+      "tasks": [],
+      "maintenance": []
     }
   ]
 }

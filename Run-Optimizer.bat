@@ -10,5 +10,6 @@ if %errorlevel% neq 0 (
   )
   exit /b
 )
-powershell.exe -NoProfile -ExecutionPolicy Bypass -STA -File "%~dp0StudentOpti.ps1" %*
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0StudentOpti.ps1" %*
+if %errorlevel% neq 0 pause
 exit /b %errorlevel%

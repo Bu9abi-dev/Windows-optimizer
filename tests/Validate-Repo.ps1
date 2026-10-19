@@ -150,6 +150,107 @@ Check 'Set-OptiServiceStartup throws for BFE Disabled' {
     Assert-Throws { Set-OptiServiceStartup -Name 'BFE' -StartupType Disabled }
 }
 
+# ---------------------------------------------------------------- tasks.json, tiers, preset maintenance
+$taskItems = @()
+Check 'config/tasks.json parses and defines tasks' {
+    $script:taskItems = @((Read-Json (Join-Path $cfgDir 'tasks.json')).tasks)
+    Assert-True ($script:taskItems.Count -gt 0) 'no tasks defined'
+}
+$taskRequired = 'id', 'name', 'category', 'description', 'risk_level', 'tier', 'check_script', 'apply_script', 'undo_script', 'task_path', 'task_name'
+foreach ($task in $taskItems) {
+    $tk = $task
+    Check "task/$($tk.id) required fields" {
+        foreach ($p in $taskRequired) { Assert-True ($tk.PSObject.Properties.Name -contains $p) "missing field '$p'" }
+        foreach ($p in 'id', 'name', 'category', 'description', 'check_script', 'apply_script', 'undo_script', 'task_path', 'task_name') {
+            Assert-True (-not [string]::IsNullOrWhiteSpace([string]$tk.$p)) "field '$p' is empty"
+        }
+        Assert-True ($validRisk -contains $tk.risk_level) "bad risk_level '$($tk.risk_level)'"
+    }
+    foreach ($k in 'check_script', 'apply_script', 'undo_script') {
+        Check "task/$($tk.id) $k parses" {
+            $errs = Get-ParseErrors ([string]$tk.$k)
+            Assert-Equal $errs.Count 0 (($errs | ForEach-Object { $_.Message }) -join '; ')
+        }
+    }
+}
+
+$allEntries = @($items) + @($taskItems | ForEach-Object { [pscustomobject]@{ File = 'tasks'; Item = $_ } })
+Check 'every tweak, service and task has tier core, deep or extreme' {
+    $bad = @($allEntries | Where-Object { @('core', 'deep', 'extreme') -notcontains [string]$_.Item.tier } |
+        ForEach-Object { "$($_.File)/$($_.Item.id)='$($_.Item.tier)'" })
+    Assert-Equal $bad.Count 0 ($bad -join ', ')
+}
+Check 'ids unique across tweaks, services and tasks' {
+    $dups = @($allEntries | ForEach-Object { $_.Item.id } | Group-Object | Where-Object { $_.Count -gt 1 } | ForEach-Object { $_.Name })
+    Assert-Equal $dups.Count 0 "duplicate ids: $($dups -join ', ')"
+}
+Check 'no task targets WindowsUpdate or Windows Defender, and none is ScheduledDefrag' {
+    $bad = @($taskItems | Where-Object { $_.task_path -match 'WindowsUpdate|Windows Defender' -or $_.task_name -eq 'ScheduledDefrag' } |
+        ForEach-Object { $_.id })
+    Assert-Equal $bad.Count 0 ($bad -join ', ')
+}
+
+$maintAllowed = 'disk_optimize', 'deep_clean', 'browser_cache', 'component_cleanup', 'windows_old', 'network_flush', 'ram_trim', 'startup_trim', 'hardware_tuning', 'restore_size'
+$presetList = @($cfg['presets'].presets)
+Check 'presets LightestWindows and StrongestOptimizer exist' {
+    $ids = @($presetList | ForEach-Object { $_.id })
+    Assert-True ($ids -contains 'LightestWindows') 'LightestWindows missing'
+    Assert-True ($ids -contains 'StrongestOptimizer') 'StrongestOptimizer missing'
+}
+foreach ($p in $presetList) {
+    $pp = $p
+    Check "preset $($pp.id) maintenance ids are known" {
+        $bad = @(@($pp.maintenance) | Where-Object { $_ -and ($maintAllowed -notcontains [string]$_) })
+        Assert-Equal $bad.Count 0 "unknown maintenance ids: $($bad -join ', ')"
+    }
+}
+Check 'StrongestOptimizer plan excludes svc_spooler, svc_sysmain, memory_compression_off and Xbox services' {
+    $sp = @($presetList | Where-Object { $_.id -eq 'StrongestOptimizer' })[0]
+    Assert-True ($null -ne $sp) 'no StrongestOptimizer preset'
+    $plan = Get-OptiPresetPlan -Preset $sp
+    $planIds = @(@($plan.TweakIds) + @($plan.ServiceIds) + @($plan.TaskIds))
+    Assert-True ($planIds.Count -gt 0) 'plan is empty'
+    foreach ($guarded in 'svc_spooler', 'svc_sysmain', 'memory_compression_off') {
+        Assert-True ($planIds -notcontains $guarded) "plan includes $guarded"
+    }
+    $xboxIds = @($services | Where-Object { $_.category -eq 'Xbox' } | ForEach-Object { $_.id })
+    $hit = @($planIds | Where-Object { $xboxIds -contains $_ })
+    Assert-Equal $hit.Count 0 "plan includes Xbox services: $($hit -join ', ')"
+}
+
+# ---------------------------------------------------------------- regression + safety gate
+Check 'regression: real Common.ps1 Write-OptiLog accepts positional level Success' {
+    # Fresh scope so the real function is used, not the stub defined further down.
+    $err = & {
+        . (Join-Path $Root 'modules/Common.ps1')
+        try { Write-OptiLog 'x' 'Success'; '' } catch { $_.Exception.Message }
+    }
+    Assert-Equal "$err" '' 'Write-OptiLog threw'
+}
+Check 'safety gate: Assert-OptiSafetyNet throws "Changes blocked" when the net fails' {
+    $msg = & {
+        . (Join-Path $Root 'modules/Backup-Manager.ps1')
+        function Invoke-OptiSafetyNet { $script:OptiSafetyNetError = 'stub'; return $false }
+        $WhatIfPreference = $false
+        $global:OptiSafetyBypass = $null
+        try { Assert-OptiSafetyNet; 'NO_THROW' } catch { $_.Exception.Message }
+    }
+    Assert-True ("$msg" -match 'Changes blocked') "expected 'Changes blocked', got: $msg"
+}
+Check 'safety gate: $global:OptiSafetyBypass lets Assert-OptiSafetyNet pass' {
+    try {
+        $global:OptiSafetyBypass = $true
+        & {
+            . (Join-Path $Root 'modules/Backup-Manager.ps1')
+            function Invoke-OptiSafetyNet { $script:OptiSafetyNetError = 'stub'; return $false }
+            $WhatIfPreference = $false
+            Assert-OptiSafetyNet
+        }
+    } finally {
+        $global:OptiSafetyBypass = $null
+    }
+}
+
 # ---------------------------------------------------------------- emergency bat
 $bat = Join-Path $Root 'Restore-Xbox-Emergency.bat'
 Check 'Restore-Xbox-Emergency.bat has CRLF line endings only' {

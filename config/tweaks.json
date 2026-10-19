@@ -16,7 +16,8 @@
           "name": "AllowTelemetry"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "activity_history",
@@ -41,7 +42,8 @@
           "name": "UploadUserActivities"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "app_launch_tracking",
@@ -58,7 +60,8 @@
           "name": "Start_TrackProgs"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "advertising_id",
@@ -75,7 +78,8 @@
           "name": "Enabled"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "lockscreen_spotlight_ads",
@@ -104,7 +108,8 @@
           "name": "SystemPaneSuggestionsEnabled"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "copilot",
@@ -129,7 +134,8 @@
           "name": "ShowCopilotButton"
         }
       ],
-      "requires_restart": "explorer"
+      "requires_restart": "explorer",
+      "tier": "core"
     },
     {
       "id": "recall",
@@ -150,7 +156,8 @@
           "name": "DisableAIDataAnalysis"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "widgets",
@@ -171,7 +178,8 @@
           "name": "AllowNewsAndInterests"
         }
       ],
-      "requires_restart": "explorer"
+      "requires_restart": "explorer",
+      "tier": "core"
     },
     {
       "id": "bing_search",
@@ -192,7 +200,8 @@
           "name": "BingSearchEnabled"
         }
       ],
-      "requires_restart": "explorer"
+      "requires_restart": "explorer",
+      "tier": "core"
     },
     {
       "id": "svchost_split",
@@ -209,7 +218,8 @@
           "name": "SvcHostSplitThresholdInKB"
         }
       ],
-      "requires_restart": "reboot"
+      "requires_restart": "reboot",
+      "tier": "deep"
     },
     {
       "id": "background_apps",
@@ -226,7 +236,8 @@
           "name": "GlobalUserDisabled"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "deep"
     },
     {
       "id": "standby_network",
@@ -238,7 +249,8 @@
       "apply_script": "if (-not $WhatIfPreference) {\n  powercfg /setdcvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 0\n  powercfg /setacvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 0\n  powercfg /setactive SCHEME_CURRENT\n}",
       "undo_script": "if (-not $WhatIfPreference) {\n  powercfg /setdcvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 1\n  powercfg /setacvalueindex SCHEME_CURRENT SUB_NONE F15576E8-98B7-4186-B944-EAFA664402D9 1\n  powercfg /setactive SCHEME_CURRENT\n}",
       "registry": [],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "deep"
     },
     {
       "id": "delivery_optimization_p2p",
@@ -255,7 +267,8 @@
           "name": "DODownloadMode"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "menu_show_delay",
@@ -272,7 +285,8 @@
           "name": "MenuShowDelay"
         }
       ],
-      "requires_restart": "signout"
+      "requires_restart": "signout",
+      "tier": "core"
     },
     {
       "id": "shutdown_timeouts",
@@ -297,7 +311,8 @@
           "name": "HungAppTimeout"
         }
       ],
-      "requires_restart": "signout"
+      "requires_restart": "signout",
+      "tier": "core"
     },
     {
       "id": "taskbar_end_task",
@@ -314,7 +329,8 @@
           "name": "TaskbarEndTask"
         }
       ],
-      "requires_restart": "explorer"
+      "requires_restart": "explorer",
+      "tier": "core"
     },
     {
       "id": "classic_context_menu",
@@ -331,7 +347,8 @@
           "name": "(default)"
         }
       ],
-      "requires_restart": "explorer"
+      "requires_restart": "explorer",
+      "tier": "core"
     },
     {
       "id": "transparency",
@@ -348,7 +365,8 @@
           "name": "EnableTransparency"
         }
       ],
-      "requires_restart": "none"
+      "requires_restart": "none",
+      "tier": "core"
     },
     {
       "id": "visual_effects",
@@ -389,7 +407,8 @@
           "name": "IconsOnly"
         }
       ],
-      "requires_restart": "signout"
+      "requires_restart": "signout",
+      "tier": "core"
     },
     {
       "id": "mouse_acceleration",
@@ -414,7 +433,793 @@
           "name": "MouseThreshold2"
         }
       ],
-      "requires_restart": "signout"
+      "requires_restart": "signout",
+      "tier": "core"
+    },
+    {
+      "id": "disable_paging_executive",
+      "name": "Keep kernel in RAM",
+      "category": "Memory",
+      "description": "Stops Windows paging kernel and drivers to disk; snappier, but uses a little more RAM so it hurts very low-memory PCs.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'DisablePagingExecutive' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'DisablePagingExecutive' -Value 1 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'DisablePagingExecutive' -Value 0 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+          "name": "DisablePagingExecutive"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "deep"
+    },
+    {
+      "id": "prefetch_ssd_tune",
+      "name": "Disable Prefetch and Superfetch (SSD)",
+      "category": "Memory",
+      "description": "Turns off prefetching, which only helps hard drives; on an HDD boot and app launch get noticeably slower.",
+      "risk_level": "Caution",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnablePrefetcher' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnableSuperfetch' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnablePrefetcher' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnableSuperfetch' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnablePrefetcher' -Value 3 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters' -Name 'EnableSuperfetch' -Value 3 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters",
+          "name": "EnablePrefetcher"
+        },
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management\\PrefetchParameters",
+          "name": "EnableSuperfetch"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "extreme",
+      "optional": true
+    },
+    {
+      "id": "memory_compression_off",
+      "name": "Disable memory compression",
+      "category": "Memory",
+      "description": "Saves CPU spent compressing RAM, but on 4-8 GB machines it causes more paging and makes things slower. Presets only apply this through hardware tuning on 16 GB+ RAM.",
+      "risk_level": "Caution",
+      "check_script": "try { (Get-MMAgent).MemoryCompression -eq $false } catch { $false }",
+      "apply_script": "if (-not $WhatIfPreference) {\n  Disable-MMAgent -MemoryCompression -ErrorAction Stop\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  Enable-MMAgent -MemoryCompression -ErrorAction Stop\n}",
+      "registry": [],
+      "requires_restart": "reboot",
+      "tier": "extreme",
+      "optional": true
+    },
+    {
+      "id": "large_system_cache_off",
+      "name": "Enforce default file cache mode",
+      "category": "Memory",
+      "description": "Makes sure LargeSystemCache is 0 (the desktop default) so RAM goes to apps rather than the file cache.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'LargeSystemCache' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'LargeSystemCache' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management' -Name 'LargeSystemCache' -Value 0 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management",
+          "name": "LargeSystemCache"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "core"
+    },
+    {
+      "id": "startup_delay_off",
+      "name": "Remove startup app delay",
+      "category": "Responsiveness",
+      "description": "Removes the artificial delay before desktop startup apps launch; apps start sooner but boot feels busier at first.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize' -Name 'StartupDelayInMSec' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize' -Name 'StartupDelayInMSec' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize' -Name 'StartupDelayInMSec'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Serialize",
+          "name": "StartupDelayInMSec"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "core"
+    },
+    {
+      "id": "fast_startup_off",
+      "name": "Disable Fast Startup",
+      "category": "Responsiveness",
+      "description": "Makes shutdown a real shutdown, fixing stale-state glitches and driver issues; cold boots may take a few seconds longer.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power' -Name 'HiberbootEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power' -Name 'HiberbootEnabled' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power' -Name 'HiberbootEnabled' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Power",
+          "name": "HiberbootEnabled"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "deep"
+    },
+    {
+      "id": "hibernation_off",
+      "name": "Disable hibernation",
+      "category": "Storage",
+      "description": "Deletes hiberfil.sys and frees several GB of disk, but laptops lose hibernate (and Fast Startup).",
+      "risk_level": "Caution",
+      "check_script": "Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power' -Name 'HibernateEnabled' -Value 0",
+      "apply_script": "if (-not $WhatIfPreference) {\n  powercfg /hibernate off\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  powercfg /hibernate on\n}",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power",
+          "name": "HibernateEnabled"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "extreme"
+    },
+    {
+      "id": "power_throttling_off",
+      "name": "Disable power throttling",
+      "category": "Power",
+      "description": "Stops Windows limiting background app CPU speed; apps run faster but battery drains quicker.",
+      "risk_level": "Caution",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling' -Name 'PowerThrottlingOff' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling' -Name 'PowerThrottlingOff' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling' -Name 'PowerThrottlingOff'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling",
+          "name": "PowerThrottlingOff"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "extreme"
+    },
+    {
+      "id": "usb_selective_suspend_off",
+      "name": "Disable USB selective suspend (plugged in)",
+      "category": "Power",
+      "description": "Keeps USB devices awake on AC power to avoid dropouts and wake lag; no effect on battery behaviour.",
+      "risk_level": "Moderate",
+      "check_script": "$q = powercfg /q SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 | Out-String\n$m = [regex]::Match($q, 'Current AC Power Setting Index:\\s*(0x[0-9a-fA-F]+)')\n$m.Success -and ([Convert]::ToInt32($m.Groups[1].Value, 16) -eq 0)",
+      "apply_script": "if (-not $WhatIfPreference) {\n  powercfg /setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0\n  powercfg /setactive SCHEME_CURRENT\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  powercfg /setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 1\n  powercfg /setactive SCHEME_CURRENT\n}",
+      "registry": [],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "win32_priority_separation",
+      "name": "Prioritise foreground apps",
+      "category": "Responsiveness",
+      "description": "Gives the app you are using short, variable CPU time slices with a boost (0x26); background tasks finish a bit slower.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 38)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 38 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl' -Name 'Win32PrioritySeparation' -Value 2 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\PriorityControl",
+          "name": "Win32PrioritySeparation"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "deep"
+    },
+    {
+      "id": "system_responsiveness",
+      "name": "Reserve less CPU for multimedia",
+      "category": "Responsiveness",
+      "description": "Lowers the CPU share reserved for background multimedia from 20% to 10%, leaving more for foreground work.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'SystemResponsiveness' -Value 10)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'SystemResponsiveness' -Value 10 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'SystemResponsiveness' -Value 20 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "SystemResponsiveness"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "deep"
+    },
+    {
+      "id": "network_throttling_off",
+      "name": "Disable network throttling",
+      "category": "Network",
+      "description": "Removes the multimedia network packet throttle for lower latency; can slightly raise CPU use during heavy transfers.",
+      "risk_level": "Moderate",
+      "check_script": "([int64](Get-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'NetworkThrottlingIndex') -band 4294967295) -eq 4294967295",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'NetworkThrottlingIndex' -Value 4294967295 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile' -Name 'NetworkThrottlingIndex' -Value 10 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile",
+          "name": "NetworkThrottlingIndex"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "deep"
+    },
+    {
+      "id": "mmcss_games_priority",
+      "name": "Raise game scheduling priority",
+      "category": "Gaming",
+      "description": "Raises GPU, CPU and disk priority for games registered with the multimedia scheduler; background apps get slightly less.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'GPU Priority' -Value 8) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Priority' -Value 6) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Scheduling Category' -Value 'High') -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'SFIO Priority' -Value 'High')",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'GPU Priority' -Value 8 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Priority' -Value 6 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Scheduling Category' -Value 'High' -Type String\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'SFIO Priority' -Value 'High' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'GPU Priority' -Value 8 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Priority' -Value 2 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'Scheduling Category' -Value 'Medium' -Type String\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games' -Name 'SFIO Priority' -Value 'Normal' -Type String",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "GPU Priority"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "Priority"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "Scheduling Category"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile\\Tasks\\Games",
+          "name": "SFIO Priority"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "game_mode_on",
+      "name": "Enable Game Mode",
+      "category": "Gaming",
+      "description": "Turns on Windows Game Mode so games get priority and Windows Update avoids interrupting them.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AutoGameModeEnabled' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AllowAutoGameMode' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AutoGameModeEnabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AllowAutoGameMode' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AutoGameModeEnabled'\nRemove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\GameBar' -Name 'AllowAutoGameMode'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\GameBar",
+          "name": "AutoGameModeEnabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\GameBar",
+          "name": "AllowAutoGameMode"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "hags_on",
+      "name": "Hardware-accelerated GPU scheduling",
+      "category": "Gaming",
+      "description": "Lets the GPU manage its own memory scheduling for lower latency; needs a supported GPU and driver and can cause glitches on some.",
+      "risk_level": "Caution",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name 'HwSchMode' -Value 2)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name 'HwSchMode' -Value 2 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name 'HwSchMode'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers",
+          "name": "HwSchMode"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "extreme"
+    },
+    {
+      "id": "fullscreen_optimizations_off",
+      "name": "Disable fullscreen optimizations",
+      "category": "Gaming",
+      "description": "Forces true exclusive fullscreen for games, which can cut input lag but may break alt-tab and overlays in some titles.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_FSEBehavior' -Value 2) -and (Test-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_HonorUserFSEBehaviorMode' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_DXGIHonorFSEWindowsCompatible' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_FSEBehavior' -Value 2 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_HonorUserFSEBehaviorMode' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_DXGIHonorFSEWindowsCompatible' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_FSEBehavior'\nRemove-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_HonorUserFSEBehaviorMode'\nRemove-OptiRegistry -Path 'HKCU:\\System\\GameConfigStore' -Name 'GameDVR_DXGIHonorFSEWindowsCompatible'",
+      "registry": [
+        {
+          "path": "HKCU:\\System\\GameConfigStore",
+          "name": "GameDVR_FSEBehavior"
+        },
+        {
+          "path": "HKCU:\\System\\GameConfigStore",
+          "name": "GameDVR_HonorUserFSEBehaviorMode"
+        },
+        {
+          "path": "HKCU:\\System\\GameConfigStore",
+          "name": "GameDVR_DXGIHonorFSEWindowsCompatible"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "extreme"
+    },
+    {
+      "id": "nagle_off",
+      "name": "Disable Nagle algorithm",
+      "category": "Network",
+      "description": "Sends small packets immediately (TcpAckFrequency/TCPNoDelay) for lower online-game latency; slightly lowers throughput efficiency.",
+      "risk_level": "Moderate",
+      "check_script": "$base = 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces'\n$keys = @(Get-ChildItem -LiteralPath $base -ErrorAction SilentlyContinue | ForEach-Object { $base + '\\' + $_.PSChildName })\n$act = @($keys | Where-Object { $ip = (@(Get-OptiRegistry -Path $_ -Name 'IPAddress') -join ''); $dh = (@(Get-OptiRegistry -Path $_ -Name 'DhcpIPAddress') -join ''); ($dh -ne '') -or (($ip -ne '') -and ($ip -ne '0.0.0.0')) })\n($act.Count -gt 0) -and (@($act | Where-Object { (Test-OptiRegistry -Path $_ -Name 'TcpAckFrequency' -Value 1) -and (Test-OptiRegistry -Path $_ -Name 'TCPNoDelay' -Value 1) }).Count -eq $act.Count)",
+      "apply_script": "$base = 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces'\n$keys = @(Get-ChildItem -LiteralPath $base -ErrorAction SilentlyContinue | ForEach-Object { $base + '\\' + $_.PSChildName })\n$act = @($keys | Where-Object { $ip = (@(Get-OptiRegistry -Path $_ -Name 'IPAddress') -join ''); $dh = (@(Get-OptiRegistry -Path $_ -Name 'DhcpIPAddress') -join ''); ($dh -ne '') -or (($ip -ne '') -and ($ip -ne '0.0.0.0')) })\nforeach ($k in $act) {\n  Set-OptiRegistry -Path $k -Name 'TcpAckFrequency' -Value 1 -Type DWord\n  Set-OptiRegistry -Path $k -Name 'TCPNoDelay' -Value 1 -Type DWord\n}",
+      "undo_script": "$base = 'HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces'\n$keys = @(Get-ChildItem -LiteralPath $base -ErrorAction SilentlyContinue | ForEach-Object { $base + '\\' + $_.PSChildName })\nforeach ($k in $keys) {\n  Remove-OptiRegistry -Path $k -Name 'TcpAckFrequency'\n  Remove-OptiRegistry -Path $k -Name 'TCPNoDelay'\n}",
+      "registry": [],
+      "requires_restart": "reboot",
+      "tier": "extreme"
+    },
+    {
+      "id": "qos_reserve_off",
+      "name": "Remove QoS bandwidth reserve",
+      "category": "Network",
+      "description": "Sets the QoS non-best-effort reservation to 0 so apps can use all bandwidth (the default reserve is already mostly unused).",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched' -Name 'NonBestEffortLimit' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched' -Name 'NonBestEffortLimit' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched' -Name 'NonBestEffortLimit'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Psched",
+          "name": "NonBestEffortLimit"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "llmnr_off",
+      "name": "Disable LLMNR",
+      "category": "Network",
+      "description": "Turns off Link-Local Multicast Name Resolution, a chatty legacy protocol; rarely needed on home or school networks.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient' -Name 'EnableMulticast' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient' -Name 'EnableMulticast' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient' -Name 'EnableMulticast'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows NT\\DNSClient",
+          "name": "EnableMulticast"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "ntfs_last_access_off",
+      "name": "Stop NTFS last-access updates",
+      "category": "Storage",
+      "description": "Stops writing a timestamp every time a file is read, reducing disk writes; only tools that rely on last-access times notice.",
+      "risk_level": "Safe",
+      "check_script": "$o = (fsutil behavior query disablelastaccess | Out-String)\n$m = [regex]::Match($o, '=\\s*(\\d)')\n$m.Success -and (@('1','3') -contains $m.Groups[1].Value)",
+      "apply_script": "if (-not $WhatIfPreference) {\n  fsutil behavior set disablelastaccess 1 | Out-Null\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  fsutil behavior set disablelastaccess 2 | Out-Null\n}",
+      "registry": [],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "ntfs_8dot3_off",
+      "name": "Disable 8.3 short names",
+      "category": "Storage",
+      "description": "Stops creating legacy 8.3 filenames for new files, speeding up folders with many files; old 16-bit installers may misbehave, existing names stay.",
+      "risk_level": "Moderate",
+      "check_script": "$o = (fsutil behavior query disable8dot3 | Out-String)\n$m = [regex]::Match($o, ':\\s*(\\d)')\n$m.Success -and ($m.Groups[1].Value -eq '1')",
+      "apply_script": "if (-not $WhatIfPreference) {\n  fsutil behavior set disable8dot3 1 | Out-Null\n}",
+      "undo_script": "if (-not $WhatIfPreference) {\n  fsutil behavior set disable8dot3 2 | Out-Null\n}",
+      "registry": [],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "ntfs_memory_usage",
+      "name": "Raise NTFS memory cache",
+      "category": "Storage",
+      "description": "Lets NTFS use more RAM for its metadata caches (NtfsMemoryUsage=2); faster file operations but takes RAM away from apps on small machines.",
+      "risk_level": "Caution",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name 'NtfsMemoryUsage' -Value 2)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name 'NtfsMemoryUsage' -Value 2 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem' -Name 'NtfsMemoryUsage'",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\FileSystem",
+          "name": "NtfsMemoryUsage"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "extreme"
+    },
+    {
+      "id": "mouse_hover_time",
+      "name": "Faster hover tooltips",
+      "category": "Responsiveness",
+      "description": "Cuts the mouse hover delay from 400 ms to 10 ms so hover previews and tooltips appear almost instantly; they may pop up by accident.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '10')",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '10' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Mouse' -Name 'MouseHoverTime' -Value '400' -Type String",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Mouse",
+          "name": "MouseHoverTime"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "core"
+    },
+    {
+      "id": "foreground_lock_timeout",
+      "name": "Allow instant window focus",
+      "category": "Responsiveness",
+      "description": "Removes the lock that stops background apps stealing focus for 200 ms; windows you open come to front immediately but can grab focus too.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'ForegroundLockTimeout' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'ForegroundLockTimeout' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'ForegroundLockTimeout' -Value 200000 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "ForegroundLockTimeout"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "deep"
+    },
+    {
+      "id": "low_level_hooks_timeout",
+      "name": "Shorter input-hook timeout",
+      "category": "Responsiveness",
+      "description": "Caps how long a stuck keyboard/mouse hook can delay input to 1 second so a bad app cannot freeze typing; a slow legitimate hook may be skipped.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'LowLevelHooksTimeout' -Value 1000)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'LowLevelHooksTimeout' -Value 1000 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'LowLevelHooksTimeout'",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "LowLevelHooksTimeout"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "deep"
+    },
+    {
+      "id": "auto_end_tasks",
+      "name": "Auto-close apps at shutdown",
+      "category": "Responsiveness",
+      "description": "Closes hung apps automatically at shutdown without asking, so shutdown never stalls, but unsaved work in them is lost.",
+      "risk_level": "Caution",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'AutoEndTasks' -Value '1')",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'AutoEndTasks' -Value '1' -Type String",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Control Panel\\Desktop' -Name 'AutoEndTasks'",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Desktop",
+          "name": "AutoEndTasks"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "extreme"
+    },
+    {
+      "id": "disable_startup_sound",
+      "name": "Silence startup sound",
+      "category": "Responsiveness",
+      "description": "Turns off the Windows boot chime; saves a fraction of a second and avoids noise in class or the library.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Name 'DisableStartupSound' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Name 'DisableStartupSound' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation' -Name 'DisableStartupSound'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Authentication\\LogonUI\\BootAnimation",
+          "name": "DisableStartupSound"
+        }
+      ],
+      "requires_restart": "reboot",
+      "tier": "core"
+    },
+    {
+      "id": "sticky_keys_prompt_off",
+      "name": "Stop Sticky Keys prompt",
+      "category": "Input",
+      "description": "Disables the shortcut that pops up the Sticky Keys dialog when Shift is pressed five times, which often interrupts games; also disables that accessibility shortcut.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Control Panel\\Accessibility\\StickyKeys' -Name 'Flags' -Value '506')",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Accessibility\\StickyKeys' -Name 'Flags' -Value '506' -Type String",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Control Panel\\Accessibility\\StickyKeys' -Name 'Flags' -Value '510' -Type String",
+      "registry": [
+        {
+          "path": "HKCU:\\Control Panel\\Accessibility\\StickyKeys",
+          "name": "Flags"
+        }
+      ],
+      "requires_restart": "signout",
+      "tier": "core"
+    },
+    {
+      "id": "ceip_off",
+      "name": "Disable Customer Experience program",
+      "category": "Privacy",
+      "description": "Opts out of the Customer Experience Improvement Program usage reporting; no visible downside.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows' -Name 'CEIPEnable' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows' -Name 'CEIPEnable' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows' -Name 'CEIPEnable'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\SQMClient\\Windows",
+          "name": "CEIPEnable"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "app_compat_telemetry_off",
+      "name": "Disable app compatibility telemetry",
+      "category": "Privacy",
+      "description": "Stops the inventory collector and program-compatibility reporting; Windows may offer fewer automatic compatibility fixes for old apps.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'AITEnable' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableInventory' -Value 1) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableUAR' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'AITEnable' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableInventory' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableUAR' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'AITEnable'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableInventory'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat' -Name 'DisableUAR'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat",
+          "name": "AITEnable"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat",
+          "name": "DisableInventory"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\AppCompat",
+          "name": "DisableUAR"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "error_reporting_off",
+      "name": "Disable Windows Error Reporting",
+      "category": "Privacy",
+      "description": "Stops crash reports being collected and sent to Microsoft; you lose automatic problem-solution suggestions.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting' -Name 'Disabled' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting' -Name 'Disabled' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting' -Name 'Disabled'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Error Reporting",
+          "name": "Disabled"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "feedback_prompts_off",
+      "name": "Stop feedback prompts",
+      "category": "Privacy",
+      "description": "Stops Windows asking for feedback and hides the feedback notifications.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Siuf\\Rules' -Name 'NumberOfSIUFInPeriod' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'DoNotShowFeedbackNotifications' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Siuf\\Rules' -Name 'NumberOfSIUFInPeriod' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'DoNotShowFeedbackNotifications' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Siuf\\Rules' -Name 'NumberOfSIUFInPeriod'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection' -Name 'DoNotShowFeedbackNotifications'",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Siuf\\Rules",
+          "name": "NumberOfSIUFInPeriod"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection",
+          "name": "DoNotShowFeedbackNotifications"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "tailored_experiences_off",
+      "name": "Disable tailored experiences",
+      "category": "Privacy",
+      "description": "Stops Microsoft using your diagnostic data to personalise tips, ads and recommendations.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableTailoredExperiencesWithDiagnosticData' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy' -Name 'TailoredExperiencesWithDiagnosticDataEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableTailoredExperiencesWithDiagnosticData' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy' -Name 'TailoredExperiencesWithDiagnosticDataEnabled' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKCU:\\Software\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableTailoredExperiencesWithDiagnosticData'\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy' -Name 'TailoredExperiencesWithDiagnosticDataEnabled' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableTailoredExperiencesWithDiagnosticData"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Privacy",
+          "name": "TailoredExperiencesWithDiagnosticDataEnabled"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "consumer_features_off",
+      "name": "Block consumer features",
+      "category": "Privacy",
+      "description": "Stops Windows silently reinstalling promoted apps and showing cloud-driven suggestions; keeps removed bloat from coming back.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableWindowsConsumerFeatures' -Value 1) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableSoftLanding' -Value 1) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableCloudOptimizedContent' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableWindowsConsumerFeatures' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableSoftLanding' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableCloudOptimizedContent' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableWindowsConsumerFeatures'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableSoftLanding'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent' -Name 'DisableCloudOptimizedContent'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableWindowsConsumerFeatures"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableSoftLanding"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent",
+          "name": "DisableCloudOptimizedContent"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "start_suggestions_off",
+      "name": "Stop Start and tips suggestions",
+      "category": "Privacy",
+      "description": "Disables suggested apps in Start, silent app installs, OEM preinstalls and Windows tips; the Start menu looks plainer.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338389Enabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353694Enabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353696Enabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Value 0) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SoftLandingEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338389Enabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353694Enabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353696Enabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SoftLandingEnabled' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-338389Enabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353694Enabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SubscribedContent-353696Enabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SilentInstalledAppsEnabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'PreInstalledAppsEnabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'OemPreInstalledAppsEnabled' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager' -Name 'SoftLandingEnabled' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-338389Enabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353694Enabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SubscribedContent-353696Enabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SilentInstalledAppsEnabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "PreInstalledAppsEnabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "OemPreInstalledAppsEnabled"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager",
+          "name": "SoftLandingEnabled"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
+    },
+    {
+      "id": "input_personalization_off",
+      "name": "Stop typing and inking collection",
+      "category": "Privacy",
+      "description": "Stops Windows collecting typing, inking and contacts to build a personal dictionary; autocorrect learns less from you.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitInkCollection' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitTextCollection' -Value 1) -and (Test-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore' -Name 'HarvestContacts' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitInkCollection' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitTextCollection' -Value 1 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore' -Name 'HarvestContacts' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitInkCollection' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization' -Name 'RestrictImplicitTextCollection' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore' -Name 'HarvestContacts' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
+          "name": "RestrictImplicitInkCollection"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\InputPersonalization",
+          "name": "RestrictImplicitTextCollection"
+        },
+        {
+          "path": "HKCU:\\Software\\Microsoft\\InputPersonalization\\TrainedDataStore",
+          "name": "HarvestContacts"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "handwriting_sharing_off",
+      "name": "Stop handwriting data sharing",
+      "category": "Privacy",
+      "description": "Prevents handwriting samples being sent to Microsoft; irrelevant if you do not use a pen.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\TabletPC' -Name 'PreventHandwritingDataSharing' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\TabletPC' -Name 'PreventHandwritingDataSharing' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\TabletPC' -Name 'PreventHandwritingDataSharing'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\TabletPC",
+          "name": "PreventHandwritingDataSharing"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "location_off",
+      "name": "Disable location services",
+      "category": "Privacy",
+      "description": "Turns location off system-wide by policy; Find My Device, maps and weather can no longer locate you.",
+      "risk_level": "Moderate",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors' -Name 'DisableLocation' -Value 1)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors' -Name 'DisableLocation' -Value 1 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors' -Name 'DisableLocation'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors",
+          "name": "DisableLocation"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "extreme"
+    },
+    {
+      "id": "remote_assistance_off",
+      "name": "Disable Remote Assistance",
+      "category": "Privacy",
+      "description": "Blocks inbound Remote Assistance connections, closing an unneeded remote-access path; you cannot invite helpers this way.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance' -Name 'fAllowToGetHelp' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance' -Name 'fAllowToGetHelp' -Value 0 -Type DWord",
+      "undo_script": "Set-OptiRegistry -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance' -Name 'fAllowToGetHelp' -Value 1 -Type DWord",
+      "registry": [
+        {
+          "path": "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Remote Assistance",
+          "name": "fAllowToGetHelp"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "deep"
+    },
+    {
+      "id": "edge_background_off",
+      "name": "Stop Edge running in background",
+      "category": "Processes",
+      "description": "Disables Edge startup boost and background mode, freeing a few hundred MB of RAM; Edge opens a little slower the first time.",
+      "risk_level": "Safe",
+      "check_script": "(Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'StartupBoostEnabled' -Value 0) -and (Test-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'BackgroundModeEnabled' -Value 0)",
+      "apply_script": "Set-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'StartupBoostEnabled' -Value 0 -Type DWord\nSet-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'BackgroundModeEnabled' -Value 0 -Type DWord",
+      "undo_script": "Remove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'StartupBoostEnabled'\nRemove-OptiRegistry -Path 'HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge' -Name 'BackgroundModeEnabled'",
+      "registry": [
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "StartupBoostEnabled"
+        },
+        {
+          "path": "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge",
+          "name": "BackgroundModeEnabled"
+        }
+      ],
+      "requires_restart": "none",
+      "tier": "core"
     }
   ]
 }
